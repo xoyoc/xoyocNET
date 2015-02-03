@@ -13,21 +13,19 @@
  *
  * @package WordPress
  */
-$url = parse_url(getenv('DATABASE_URL') ? getenv('DATABASE_URL') : getenv('CLEARDB_DATABASE_URL'));
-
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define('DB_NAME', trim($url['path'], '/'));
+define('DB_NAME', 'database_name_here');
 
 /** MySQL database username */
-define('DB_USER', $url['user']);
+define('DB_USER', 'username_here');
 
 /** MySQL database password */
-define('DB_PASSWORD', $url['pass']);
+define('DB_PASSWORD', 'password_here');
 
 /** MySQL hostname */
-define('DB_HOST', $url['host']);
+define('DB_HOST', 'localhost');
 
 /** Database Charset to use in creating database tables. */
 define('DB_CHARSET', 'utf8');
@@ -44,17 +42,17 @@ define('DB_COLLATE', '');
  *
  * @since 2.6.0
  */
-define('AUTH_KEY',         getenv('AUTH_KEY'));
-define('SECURE_AUTH_KEY',  getenv('SECURE_AUTH_KEY'));
-define('LOGGED_IN_KEY',    getenv('LOGGED_IN_KEY'));
-define('NONCE_KEY',        getenv('NONCE_KEY'));
-define('AUTH_SALT',        getenv('AUTH_SALT'));
-define('SECURE_AUTH_SALT', getenv('SECURE_AUTH_SALT'));
-define('LOGGED_IN_SALT',   getenv('LOGGED_IN_SALT'));
-define('NONCE_SALT',       getenv('NONCE_SALT'));
+
+define('AUTH_KEY',         'zI{CPQ&sz<C:z:*]B{ubGfT|K6#w6qUP[*biL#6bksmq[AP^RA>IF<{u^e-nN+hB');
+define('SECURE_AUTH_KEY',  '#qy+_*Ht+3{abPH)+r|#gT|srp6=D<1Jl,XTs&?/N0m;qhwh>YCY:@@S;PK=Vy)$');
+define('LOGGED_IN_KEY',    'Q1>9vpqW#6{Sd7{LPXo?7Q$90fEv53*-Z3rT,6%G6FZPet}Pck]9Uba48u5%f5RJ');
+define('NONCE_KEY',        'nM-xV5_W`t:gP,33!q;A=!XwIk ){kcf>cGY:kD;+YJI|{`OR|gRB<c9maIh-()M');
+define('AUTH_SALT',        'S+ch?~qEaf+gQ&#lr+--a/Q2s^[yEaY(`k7,r|Q5IqjEkH9KDk3%A.AYP&Pi.&S&');
+define('SECURE_AUTH_SALT', '`oUsVnNlGcj<b gv*/A>m|;6&qn|Ue&(|%&$kMUwz?~kyXtC6~yGzFJOfn4*gNIT');
+define('LOGGED_IN_SALT',   'u*hXUFh`:J(e!<S,|Y4rq]^/qL2@IOzWKgywLOG>;aX-y+UDwm;sl]:uqU%5EWiU');
+define('NONCE_SALT',       'HT![W6Z}JWl>wgg$43yvL_M&$++yfg/R7T578{S|Wl5:1yhEtq$>Sg.{nK<3#oTS');
 
 /**#@-*/
-
 
 /**
  * WordPress Database Table prefix.
