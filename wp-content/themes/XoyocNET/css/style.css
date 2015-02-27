@@ -1,0 +1,81 @@
+@import url(http://fonts.googleapis.com/css?family=Cabin+Condensed:400,700);
+
+body
+{
+	font-family: 'Cabin Condensed', sans-serif;
+	font-size: 20px;
+	padding: .5em;
+}
+
+header
+{
+	background: #bbb;
+	float: left;
+	min-height: 900px;
+	width: 20%;
+}
+
+header figure
+{
+	margin: .5em;
+}
+
+header figure img
+{
+	width: 350px;
+	height: 220px;
+}
+
+header nav
+{
+	width: 60%;
+	margin: auto;
+}
+
+header nav ul li
+{
+	display: inline-block;
+	margin: 1em 0;
+}
+
+header nav ul li a
+{
+	font-size: 1.3em;
+	text-decoration: none;
+	padding: 0 .5em;
+}
+
+header nav ul li a:hover
+{
+	color: blue;
+	border-left: solid .2em red;
+}
+
+main
+{
+	background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(#bbb), to(#286af0));
+	background: gradient(linear, 0% 0%, 100% 0%, from(#bbb), to(#286af0));
+	float: right;
+	height: 900px;
+	width: 79%;
+}
+
+main section, figure
+{
+	display: inline-block;
+}
+
+footer
+{
+	background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(#bbb), to(#286af0));
+	background: gradient(linear, 0% 0%, 100% 0%, from(#bbb), to(#286af0));
+	position: relative;
+	margin-top: -100px;
+	clear: both;
+}
+
+.animacion
+{
+	-webkit-transition: all .3s ease-out;
+	transition: all .3s ease-out;
+}

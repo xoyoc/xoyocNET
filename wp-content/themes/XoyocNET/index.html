@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es-mx" />
+<head>
+	<meta charset="UTF-8" />
+	<title>Xoyoc.Net</title>
+	<meta name="description" content="Front-end developer es mi protección realizo proyectos a empresas ubicadas en el puerto de Lázaro Cárdenas, Michoacán, trato de ser FreeLancer en mis tiempos libres ya que trabajo para la asociación de agentes aduanales en donde estoy a cargo del departamento de IT." />
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scala=1" />
+	<!-- Descripcion de la web y el diseño resposivo -->
+	<link rel="shortcut icon" type="image/x-icon" href="xoyoc.ico" />
+	<link rel="apple-touch-icon" type="apple-touch-icon" href="apple-touch-xoyoc.png" />
+	<link rel="author" type="text/plain" href="humans.txt" />
+	<link rel="stylesheet" href="css/normalize.css" />
+	<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+	<header>
+		<figure>
+			<img src="img/logotipo.png" alt="LOGOTIPO">
+		</figure>
+		<nav>
+			<ul>
+				<li><a class="animacion" href="#diseño_web">Diseño Web</a></li>
+				<li><a class="animacion" href="#portafolio">Portafolio</a></li>
+				<li><a class="animacion" href="#blog">Blog</a></li>
+				<li><a class="animacion" href="#contacto">Contacto</a></li>
+			</ul>
+		</nav>
+	</header>
+	<main>
+		<section id="diseño_web">
+			<h3>Diseño Web</h3>
+			<figure>
+				<img src="img/diseno-web-adaptable.jpg" alt="responsive_design">
+			</figure>
+			<figure>
+				<img src="img/responsive-design.png" alt="responsive_design">
+			</figure>
+			<figure>
+				<img src="img/WordPress-HTML5.jpg" alt="html5_wordpress">
+			</figure>
+		</section>
+		<section id="portafolio">
+			<h3>Portafolio</h3>
+		</section>
+		<section id="blog">
+			<h3>Blog</h3>
+		</section>		
+	</main>
+	<footer id="contacto">
+		<form action="">
+			<label>
+            	<input name="nombre" id="c_name" type="text" class="c_input" placeholder="Nombre..."/>
+            	<input name="email"  id="c_mail" type="email" class="c_input" placeholder="Email..."/>
+            	<textarea name="mensaje"  id="c_msg" placeholder="Mensaje..."></textarea>
+            	<input name="send" onclick="cargaSendMail()" type="button" value="Enviar" class="btn-b" id="c_enviar"></input>
+			</label>
+		</form>
+	</footer>
+</body>
+</html>
