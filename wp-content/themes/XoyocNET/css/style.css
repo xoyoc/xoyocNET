@@ -103,6 +103,10 @@ footer form label textarea
 	margin-top: .5em;
 }
 
+#panel-boton
+{
+	display: none;
+}
 
 .animacion
 {
@@ -146,5 +150,81 @@ footer form label textarea
 }
 
 @media screen and (max-width: 375px){
+	body
+	{
+		min-height: 100%;
+		overflow-x: hidden;
+		overflow-y: scroll;
+		position: absolute;
+		width: 100%
+	}
+	header
+	{
+		position: fixed;
+		top: 0;
+		width: 100%;
+		z-index: 999;
+	}
+	header h1 img
+	{
+		width: 60%;
+		height: 60%;
+	}
+	main
+	{
+		height: 280px;
+	}
+	main figure
+	{
+		width: 70%;
+		height: 70%;
+	}
+	footer
+	{
 
+	}
+	#panel
+	{
+		height: 100%;
+		left: 0;
+		opacity: 0;
+		overflow-x: hidden;
+		position: fixed;
+		top: 0;
+		width: 0;
+	}
+	#panel-boton:checked ~ #panel-etiqueta, #panel-boton:checked ~ header, #panel-boton:checked ~ #contenido
+	{
+		margin-left: 75%;
+	}
+
+	#panel-boton:checked ~ #panel
+	{
+		opacity: 1;
+		width: 75%;
+	}
+
+	#panel-etiqueta
+	{
+		cursor: pointer;
+		font-size: 2em;
+		height: .65em; 
+		left: .25em;
+		position: fixed;
+		top: .25em;
+		width: 1em;
+		z-index: 1000;
+	}
+
+	#panel-etiqueta:before
+	{
+		background: rgb(40,106,240);
+		border-radius: .15em;
+		box-shadow: 0 .25em 0 rgb(40,106,240), 0 .5em 0 rgb(40,106,240);
+		content: "";
+		height: .15em;
+		left: 0;
+		position: absolute;
+		width: 1em;
+	}
 }
