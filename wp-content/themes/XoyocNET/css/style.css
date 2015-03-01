@@ -6,6 +6,10 @@ body
 	font-family: 'Cabin Condensed', sans-serif;
 	font-size: 20px;
 	padding: 2em;
+	overflow-x:hidden;
+	overflow-y:  scroll;
+	position: absolute;
+	z-index: 999;
 }
 
 header
@@ -14,6 +18,7 @@ header
 	float: left;
 	min-height: 850px;
 	width: 20%;
+	
 }
 
 header figure
@@ -108,6 +113,8 @@ footer form label textarea
 	display: none;
 }
 
+
+
 .animacion
 {
 	-webkit-transition: all .3s ease-out;
@@ -141,61 +148,32 @@ footer form label textarea
 	
 }
 
-@media screen and (max-width: 720px){
-	
-}
-
-@media screen and (max-width: 640px){
-	
-}
-
-@media screen and (max-width: 375px){
+@media screen and (max-width: 800px){
 	body
 	{
-		min-height: 100%;
-		overflow-x: hidden;
-		overflow-y: scroll;
-		position: absolute;
-		width: 100%
+		padding: 0;
+		margin: 0;
 	}
 	header
 	{
-		position: fixed;
-		top: 0;
-		width: 100%;
-		z-index: 999;
-	}
-	header h1 img
-	{
-		width: 60%;
-		height: 60%;
-	}
-	main
-	{
-		height: 280px;
-	}
-	main figure
-	{
-		width: 70%;
-		height: 70%;
-	}
-	footer
-	{
-
-	}
-	#panel
-	{
-		height: 100%;
-		left: 0;
+		background: rgb(187,187,187);
+		margin: 0;
+		left: -100%;
 		opacity: 0;
 		overflow-x: hidden;
+		height: 100%;
 		position: fixed;
-		top: 0;
-		width: 0;
+		width: 80%;
 	}
+	header nav ul li
+	{
+		display: block;
+		border-bottom: .2em solid rgba(255,255,255, .3)
+	}
+
 	#panel-boton:checked ~ #panel-etiqueta, #panel-boton:checked ~ header, #panel-boton:checked ~ #contenido
 	{
-		margin-left: 75%;
+		margin-left: 85%;
 	}
 
 	#panel-boton:checked ~ #panel
@@ -203,7 +181,6 @@ footer form label textarea
 		opacity: 1;
 		width: 75%;
 	}
-
 	#panel-etiqueta
 	{
 		cursor: pointer;
