@@ -1,0 +1,31 @@
+COMO SUBIR ACTULIZACIONES EN HEROKU
+
+COMANDOS EN MS-DOS
+
+para inicialicar un repositorio en la computara es el comando
+
+git init ---> se inicializa el repositorio
+git add . ----> se agregan los cambios 
+git status ---> verificar que se agrego al repositorio
+
+heroku config  ---> checar variables de entorno creadas
+
+PASO 1
+
+heroku auth:login email xoyoc_l2@hotmail.com --> Azrael1977
+
+PASO 2 Crear el proyecto en heroku
+
+heroku create {nombre del proyecto}
+
+PASO 2.1 para agregar addons 
+
+heroku addons:add {nombre del addons a agregar}
+
+PASO 3 Realizando los comentarios
+
+git commit -m "Lo cambios que se realizaron"
+
+PASO 4 Subir el repositorio a heroku en el master
+
+git push heroku master
