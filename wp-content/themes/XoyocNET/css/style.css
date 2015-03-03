@@ -4,7 +4,7 @@ body
 {
 	background: url(../img/fondo.jpg) fixed;
 	font-family: 'Cabin Condensed', sans-serif;
-	font-size: 20px;
+	font-size: 18px;
 	padding: 2em;
 	overflow-x:hidden;
 	overflow-y:  scroll;
@@ -16,7 +16,6 @@ header
 {
 	background: rgba(187,187,187,.5);
 	float: left;
-	min-height: 850px;
 	width: 20%;
 }
 
@@ -51,7 +50,7 @@ header nav ul li
 
 header nav ul li a
 {
-	font-size: 1.5em;
+	font-size: 2em;
 	text-decoration: none;
 	padding: 0 .5em;
 }
@@ -66,14 +65,17 @@ main
 {
 	background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(187,187,187,.5)), to(rgba(40,106,240,.5)));
 	background: gradient(linear, 0% 0%, 100% 0%, from(rgba(187,187,187,.5)), to(rgba(40,106,240,.5)));
+	font-size: 1.5em;
 	float: right;
-	height: 850px;
+	height: auto;
 	width: 79%;
 }
 
 main section
 {
-	padding: .5em;
+	margin: auto;
+	width: 90%;
+	padding: 1em;
 }
 
 main section, figure
@@ -124,19 +126,25 @@ footer form label textarea
 	transition: all .3s ease-out;
 }
 
-@media screen and (max-width: 1750px){
+@media screen and (max-width: 1720px){
 	header
 	{
-		height: auto;
+		height: 100%;
 	}
 	header figure img
 	{
 		width: 250px;
 		height: 120px;
 	}
+	header nav ul li a
+	{
+		font-size: 1.8em;
+	}
 	main
 	{
 		height: auto;
+		padding: 1em;
+		width: 75%;
 	}
 	main figure
 	{
@@ -165,15 +173,9 @@ footer form label textarea
 		width: 100%;
 		height: 500px;
 	}
-	main section p 
-	{
-		display: inline-block;
-		width: 80%;
-	}
 }
 
 @media screen and (max-width: 800px){
-
 	body
 	{
 		padding: 0;
@@ -183,13 +185,12 @@ footer form label textarea
 	{
 		background: rgb(187,187,187);
 		margin: 0;
-		left: -100;
+		left: 0;
 		opacity: 0;
 		overflow-x: hidden;
 		height: 100%;
 		position: fixed;
 		width: 65%;
-		z-index: 1;
 	}
 	header figure img
 	{
@@ -198,7 +199,6 @@ footer form label textarea
 	}
 	header nav ul li
 	{
-		display: block;
 		border-bottom: .2em solid rgba(255,255,255, .3)
 	}
 	main
