@@ -240,3 +240,19 @@ footer form label textarea
 		width: 1em;
 	}
 }
+
+@media screen and (min-width: 400px){
+	header nav ul li a
+	{
+		font-size: 1em;
+	}
+	main
+	{
+		margin: 0;
+		padding: 0;
+	}
+	main section figure img
+	{
+		width: 20%;
+	}
+}
