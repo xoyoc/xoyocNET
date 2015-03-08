@@ -251,9 +251,13 @@ footer form label textarea
 		margin: 0;
 		padding: 0;
 	}
+	main section
+	{
+		font-size: .8em;
+		width: 60%;
+	}
 	main section figure
 	{
-		width: 50%;
-		height: 50%;
+		display: none;
 	}
 }
