@@ -241,7 +241,7 @@ footer form label textarea
 	}
 }
 
-@media screen and (min-width: 400px){
+@media screen and (max-width: 400px){
 	header nav ul li a
 	{
 		font-size: 1em;
@@ -251,8 +251,9 @@ footer form label textarea
 		margin: 0;
 		padding: 0;
 	}
-	main section figure img
+	main section figure
 	{
-		width: 20%;
+		width: 50%;
+		height: 50%;
 	}
 }
