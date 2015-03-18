@@ -16,40 +16,47 @@ header
 {
 	background: rgba(187,187,187,.5);
 	float: left;
-	width: 20%;
+	width: 95%;
+	max-height: 100px;
 }
 
 header figure
 {
-	margin: .5em;
+	float: left;
+	display: block;
+	padding: 0;
+	width: 180px;
+	height: 70px;
 }
 
 header figure img
 {
-	width: 350px;
-	height: 220px;
+	width: 180px;
+	height: 70px;
 }
 
 header nav
 {
-	width: 75%;
-	margin: .5em;
+	width: 90%;
+	margin: 1.5em .5em;
 }
 
 header nav ul
 {
 	width: 90%;
 	margin: 0;
+	list-style: none;
 }
 
 header nav ul li
 {
-	display: inline-block;
-	margin: 1em 0;
+	float: left;
+	margin: 1em 3em;
 }
 
 header nav ul li a
 {
+	display: block;
 	font-size: 2em;
 	text-decoration: none;
 	padding: 0 .5em;
@@ -58,7 +65,7 @@ header nav ul li a
 header nav ul li a:hover
 {
 	color: blue;
-	border-left: solid .2em red;
+	border-bottom: solid .1em red;
 }
 
 main
@@ -66,9 +73,8 @@ main
 	background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(187,187,187,.5)), to(rgba(40,106,240,.5)));
 	background: gradient(linear, 0% 0%, 100% 0%, from(rgba(187,187,187,.5)), to(rgba(40,106,240,.5)));
 	font-size: 1.5em;
-	float: right;
 	height: auto;
-	width: 79%;
+	width: 95%;
 }
 
 main section
@@ -85,17 +91,15 @@ main section, figure
 
 main section figure img
 {
-	height: 90%;
-	width: 90%;
+	height: 70%;
+	width: 70%;
 }
 
 footer
 {
 	background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(187,187,187,.5)), to(rgba(40,106,240,.5)));
 	background: gradient(linear, 0% 0%, 100% 0%, from(rgba(187,187,187,.5)), to(rgba(40,106,240,.5)));
-	position: relative;
-	margin-top: -30px;
-	clear: both;
+	width: 95%;
 }
 
 footer form
@@ -133,18 +137,11 @@ footer form label textarea
 	}
 	header figure img
 	{
-		width: 250px;
-		height: 120px;
-	}
-	header nav ul li a
-	{
-		font-size: 1.8em;
+
 	}
 	main
 	{
-		height: auto;
-		padding: 1em;
-		width: 75%;
+
 	}
 	main figure
 	{
@@ -161,18 +158,55 @@ footer form label textarea
 @media screen and (max-width: 1660px){
 	header figure img
 	{
-		width: 100%;
-		height: 100%;
+
 	}
 	header nav ul li
 	{
-		display: block;
+		margin: 1em 2em;
 	}
 	main section figure img
 	{
-		width: 100%;
-		height: 500px;
+		width: 60%;
+		height: 60%;
 	}
+}
+
+@media screen and (max-width: 1437px){
+	header nav ul li a
+	{
+		font-size: 1.6em;
+	}
+	header nav ul li
+	{
+		margin: 1em 2em;
+	}	
+}
+@media screen and (max-width: 1320px){
+	header nav ul li
+	{
+		margin: 1em 1.2em;
+	}	
+}
+
+@media screen and (max-width: 1132px){
+	header nav ul li a
+	{
+		font-size: 1.5em;
+	}
+	header nav ul li
+	{
+		margin: 1em .5em;
+	}	
+}
+@media screen and (max-width: 840px){
+	header nav ul li a
+	{
+		font-size: 1em;
+	}
+	header nav ul li
+	{
+		margin: .5em .3em;
+	}	
 }
 
 @media screen and (max-width: 800px){
@@ -185,21 +219,31 @@ footer form label textarea
 	{
 		background: rgb(187,187,187);
 		margin: 0;
-		left: 0;
+		left: -100;
 		opacity: 0;
-		overflow-x: hidden;
 		height: 100%;
 		position: fixed;
-		width: 65%;
+		width: 80%;
+	}
+	header nav
+	{
+		width: 100%;
+		height: 100%;
+	}
+	header figure
+	{
+		float: none;
 	}
 	header figure img
 	{
-		width: 70%;
-		height: 70%;
+		width: 110%;
+		height: 110%;
 	}
 	header nav ul li
 	{
-		border-bottom: .2em solid rgba(255,255,255, .3)
+		border-bottom: .3em solid rgba(255,255,255, .3);
+		display: block;
+		float: none;
 	}
 	main
 	{
