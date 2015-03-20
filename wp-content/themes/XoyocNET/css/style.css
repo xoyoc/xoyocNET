@@ -6,18 +6,15 @@ body
 	font-family: 'Cabin Condensed', sans-serif;
 	font-size: 18px;
 	padding: 2em;
-	overflow-x:hidden;
-	overflow-y:  scroll;
-	position: absolute;
-	z-index: 999;
 }
 
 header
 {
 	background: rgba(187,187,187,.5);
-	float: left;
 	width: 95%;
-	max-height: 100px;
+	height: 100%;
+	margin: auto;
+	max-width: 1720px;
 }
 
 header figure
@@ -25,26 +22,26 @@ header figure
 	float: left;
 	display: block;
 	padding: 0;
-	width: 180px;
-	height: 70px;
+	margin: 0 1em;
+	width: 200px;
+	height: 90px;
 }
 
 header figure img
 {
-	width: 180px;
-	height: 70px;
+	width: 200px;
+	height: 90px;
 }
 
 header nav
 {
 	width: 90%;
-	margin: 1.5em .5em;
+	margin: auto;
 }
 
 header nav ul
 {
-	width: 90%;
-	margin: 0;
+	overflow: hidden;	
 	list-style: none;
 }
 
@@ -75,11 +72,12 @@ main
 	font-size: 1.5em;
 	height: auto;
 	width: 95%;
+	margin: auto;
+	max-width: 1720px;
 }
 
 main section
 {
-	margin: auto;
 	width: 90%;
 	padding: 1em;
 }
@@ -91,6 +89,7 @@ main section, figure
 
 main section figure img
 {
+	margin: auto;
 	height: 70%;
 	width: 70%;
 }
@@ -100,6 +99,8 @@ footer
 	background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(187,187,187,.5)), to(rgba(40,106,240,.5)));
 	background: gradient(linear, 0% 0%, 100% 0%, from(rgba(187,187,187,.5)), to(rgba(40,106,240,.5)));
 	width: 95%;
+	margin: auto;
+	max-width: 1720px;
 }
 
 footer form
@@ -252,13 +253,13 @@ footer form label textarea
 	}
 	#panel-boton:checked ~ #panel-etiqueta, #panel-boton:checked, #panel-boton:checked ~ #contenido
 	{
-		margin-left: 65%;
+		margin-left: 100%;
 	}
 
 	#panel-boton:checked ~ #panel
 	{
 		opacity: 1;
-		width: 65%;
+		width: 100%;
 	}
 	#panel-etiqueta
 	{
@@ -269,7 +270,6 @@ footer form label textarea
 		position: fixed;
 		top: .25em;
 		width: 1em;
-		z-index: 1000;
 	}
 
 	#panel-etiqueta:before
