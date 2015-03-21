@@ -1248,7 +1248,31 @@
 																if(data.success){
 																	 location.reload();
 																}else{
-																	alert(data.error_message);
+																	var warning_box = jQuery("#wpfc-plugin-setup-warning");
+																	var message = "";
+																	wpfc.dictionary = typeof wpfc.dictionary != "undefined" ? wpfc.dictionary : [];
+																	
+																	message += typeof wpfc.dictionary[data.error_message] != "undefined" ? wpfc.dictionary[data.error_message] : data.error_message;
+																	message += ". ";
+																	message += typeof wpfc.dictionary["You need to activate the premium plugin manually"] != "undefined" ? wpfc.dictionary["You need to activate the premium plugin manually"] : "You need to activate the premium plugin manually";
+																	message += ". ";
+																	message += typeof wpfc.dictionary["Please read the tutorial"] != "undefined" ? wpfc.dictionary["Please read the tutorial"] : "Please read the tutorial"; 
+																	message += ". ";
+
+																	warning_box.find(".fieldRow").text(message);
+																	warning_box.find("#wpfc-read-tutorial").click(function(){
+																		warning_box.hide();
+																		var win = window.open("http://www.wpfastestcache.com/warnings/how-to-activate-premium-version-manually/", '_blank');
+																		win.focus();
+																	});
+
+																	var windowHeight = 70;//(jQuery(window).height() - warning_box.height())/2;
+																	var windowWidth = (jQuery(window).width() - warning_box.width())/2;
+
+																	warning_box.css({"top": windowHeight, "left": windowWidth, "display" : "block", "position" : "fixed"});
+
+																	jQuery("#revert-loader-toolbar").hide();
+
 																}
 																console.log(data, "data");
 															}
@@ -1420,6 +1444,29 @@
 				  </div>
 				</div>
 			</div>
+
+
+
+
+
+			<div id="wpfc-plugin-setup-warning" class="mainContent" style="display:none;border:1px solid black">
+			        <div class="pageView"style="display: block;">
+			            <div class="fakeHeader">
+			                <h3 class="title-h3">Error Occured</h3>
+			            </div>
+			            <div class="fieldRow active">
+
+			            </div>
+			            <div class="pagination">
+			                <div class="next" style="text-align: center;float: none;">
+			                    <button class="wpfc-btn primaryCta" id="wpfc-read-tutorial">
+			                        <span class="label">Continue</span>
+			                    </button>
+			                </div>
+			            </div>
+			        </div>
+			</div>
+
 			<?php if(!class_exists("WpFastestCacheImageOptimisation")){ ?>
 				<div id="wpfc-promotion" style="height:250px; bottom: -153px; position: fixed; z-index: 9999; right: 20px;cursor: pointer;">
 					<img src="<?php echo plugins_url("wp-fastest-cache/images/promotions/promotion-1.jpg"); ?>">

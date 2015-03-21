@@ -3,7 +3,7 @@
 Plugin Name: WP Fastest Cache
 Plugin URI: http://wordpress.org/plugins/wp-fastest-cache/
 Description: The simplest and fastest WP Cache system
-Version: 0.8.4.4
+Version: 0.8.4.5
 Author: Emre Vona
 Author URI: http://tr.linkedin.com/in/emrevona
 
@@ -96,18 +96,18 @@ GNU General Public License for more details.
 											$result = activate_plugin( 'wp-fastest-cache-premium/wpFastestCachePremium.php' );
 
 											if ( is_wp_error( $result ) ) {
-												$res = array("success" => false, "error_message" => "Go to: http://www.wpfastestcache.com/warnings/how-to-activate-premium-version/"); 
+												$res = array("success" => false, "error_message" => "Error occured while the plugin was activated", "error_code" => 1); 
 											}else{
 												$res = array("success" => true);   
 											}
 										} else {
-											$res = array("success" => false, "error_message" => 'Go to: http://www.wpfastestcache.com/warnings/how-to-activate-premium-version/');      
+											$res = array("success" => false, "error_message" => 'Error occured while the file was unzipped', "error_code" => 2);      
 										}
 									}else{
-										$res = array("success" => false, "error_message" => "/wp-content/plugins/ is not writable");
+										$res = array("success" => false, "error_message" => "unzip_file() is not found", "error_code" => 3);
 									}
 								}else{
-									$res = array("success" => false, "error_message" => "/wp-content/plugins/ is not writable");
+									$res = array("success" => false, "error_message" => "/wp-content/plugins/ is not writable", "error_code" => 4);
 								}
 							}else{
 								$res = array("success" => false, "error_message" => "Error: Service is unavailable. Try later...");
@@ -275,8 +275,9 @@ GNU General Public License for more details.
 
 			if(preg_match("/http:\/\/[^\/]+\/(.+)/", $permalink, $out)){
 				$path = $this->getWpContentDir()."/cache/all/".$out[1];
+				$mobile_path = $this->getWpContentDir()."/cache/wpfc-mobile-cache/".$out[1];
+
 				if(is_dir($path)){
-					
 					if($this->isPluginActive("wp-fastest-cache-premium/wpFastestCachePremium.php")){
 						include_once $this->get_premium_path("logs.php");
 						$log = new WpFastestCacheLogs("delete");
@@ -284,6 +285,10 @@ GNU General Public License for more details.
 					}
 
 					$this->rm_folder_recursively($path);
+				}
+
+				if(is_dir($mobile_path)){
+					$this->rm_folder_recursively($mobile_path);
 				}
 			}
 		}
