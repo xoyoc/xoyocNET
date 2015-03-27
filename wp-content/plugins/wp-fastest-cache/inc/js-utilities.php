@@ -30,6 +30,10 @@
 					$jsScript = content_url()."/cache/wpfc-minified/".md5($value);
 
 					if(strpos($this->getJsLinksExcept(), $out[0][$key]) === false){
+						if(preg_match("/window\.dynamicgoogletags/", $value)){
+							continue;
+						}
+
 						if(!is_dir($cachFilePath)){
 							$prefix = time();
 							$wpfc->createFolder($cachFilePath, $value, "js", $prefix);
@@ -83,8 +87,10 @@
 
 			preg_match_all("/<script[^\>]*>((?:(?!<\/script).)+)action\=wordfence_logHuman\&hid=((?:(?!<\/script).)+)<\/script>/si", $head[1], $WordfenceLogHuman);
 
+			preg_match_all("/<script[^\>]*>((?:(?!<\/script).)+)document\.write((?:(?!<\/script).)+)<\/script>/si", $head[1], $documentWrite);
 
-			$this->jsLinksExcept = implode(" ", array_merge($jsLinksInIf[0], $jsLinksCommentOut[0], $jsLinksGoogleAnalytics[0], $jsLinksGoogleAnalyticsYoast[0], $jsLinksGoogleAnalyticsPush[0], $jsLinksGoogleFonts[0], $WordfenceLogHuman[0]));
+
+			$this->jsLinksExcept = implode(" ", array_merge($jsLinksInIf[0], $jsLinksCommentOut[0], $jsLinksGoogleAnalytics[0], $jsLinksGoogleAnalyticsYoast[0], $jsLinksGoogleAnalyticsPush[0], $jsLinksGoogleFonts[0], $WordfenceLogHuman[0], $documentWrite[0]));
 		}
 
 		public function getJsLinksExcept(){
