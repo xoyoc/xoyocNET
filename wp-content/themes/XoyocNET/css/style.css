@@ -8,61 +8,54 @@ body
 	padding: 2em;
 }
 
-header
+.encabezado
 {
-	background: rgba(187,187,187,.5);
-	width: 95%;
-	height: 100%;
-	margin: auto;
+	width: 100%;
 	max-width: 1720px;
 }
-
-header figure
-{
-	float: left;
-	display: block;
-	padding: 0;
-	margin: 0 1em;
-	width: 200px;
-	height: 90px;
-}
-
-header figure img
-{
-	width: 200px;
-	height: 90px;
-}
-
-header nav
-{
-	width: 90%;
-	margin: auto;
-}
+ 	.encabezado__logo--imagen
+	{
+		float: left;
+		width: 230px;
+		height: 150px;
+	}
+	.menu-movil
+	{
+		background: rgba(12,66,113,.5);
+		height: 10%;
+		width: 90%;
+		margin: auto;
+	}
+	.menu-movil--boton
+	{
+		font-size: 2em;
+		display: none;
+	}
 
 header nav ul
 {
-	overflow: hidden;	
+	overflow: hidden;
 	list-style: none;
 }
 
 header nav ul li
 {
 	float: left;
-	margin: 1em 3em;
 }
 
 header nav ul li a
 {
 	display: block;
+	color: rbg(193,223,251);
 	font-size: 2em;
 	text-decoration: none;
-	padding: 0 .5em;
+	padding: .5em;
 }
 
 header nav ul li a:hover
 {
-	color: blue;
-	border-bottom: solid .1em red;
+	color: rbg(36,111,179);
+	border-bottom: solid .1em rgb(95,148,66);
 }
 
 main
@@ -73,25 +66,26 @@ main
 	height: auto;
 	width: 95%;
 	margin: auto;
+	padding: .5em;
 	max-width: 1720px;
+	overflow: hidden;
+}
+
+main section p 
+{
 }
 
 main section
 {
 	width: 90%;
-	padding: 1em;
 }
 
-main section, figure
+main section img
 {
-	display: inline-block;
-}
-
-main section figure img
-{
-	margin: auto;
-	height: 70%;
-	width: 70%;
+	margin: 0 1em;
+	height: 60%;
+	width: 60%;
+	float: left;
 }
 
 footer
@@ -131,177 +125,176 @@ footer form label textarea
 	transition: all .3s ease-out;
 }
 
-@media screen and (max-width: 1720px){
-	header
-	{
-		height: 100%;
-	}
-	header figure img
-	{
-
-	}
-	main
-	{
-
-	}
-	main figure
-	{
-		width: 90%;
-		height: 90%;
-	}
-	footer
-	{
-
-	}
-	
-}
-
-@media screen and (max-width: 1660px){
-	header figure img
-	{
-
-	}
-	header nav ul li
-	{
-		margin: 1em 2em;
-	}
-	main section figure img
-	{
-		width: 60%;
-		height: 60%;
-	}
-}
-
-@media screen and (max-width: 1437px){
-	header nav ul li a
-	{
-		font-size: 1.6em;
-	}
-	header nav ul li
-	{
-		margin: 1em 2em;
-	}	
-}
-@media screen and (max-width: 1320px){
-	header nav ul li
-	{
-		margin: 1em 1.2em;
-	}	
-}
-
-@media screen and (max-width: 1132px){
-	header nav ul li a
-	{
-		font-size: 1.5em;
-	}
-	header nav ul li
-	{
-		margin: 1em .5em;
-	}	
-}
-@media screen and (max-width: 840px){
-	header nav ul li a
-	{
-		font-size: 1em;
-	}
-	header nav ul li
-	{
-		margin: .5em .3em;
-	}	
-}
 
 @media screen and (max-width: 800px){
-	body
+	.menu-movil
 	{
-		padding: 0;
-		margin: 0;
-	}
-	header
-	{
-		background: rgb(187,187,187);
-		margin: 0;
-		left: -100;
-		opacity: 0;
+		background-color: rgb(12,66,113);
+		width: 50%;
 		height: 100%;
+		margin: 0;
 		position: fixed;
-		width: 80%;
 	}
-	header nav
-	{
-		width: 100%;
-		height: 100%;
-	}
-	header figure
+	.encabezado__logo--imagen
 	{
 		float: none;
 	}
-	header figure img
-	{
-		width: 110%;
-		height: 110%;
-	}
 	header nav ul li
 	{
-		border-bottom: .3em solid rgba(255,255,255, .3);
 		display: block;
 		float: none;
 	}
-	main
+	.menu-movil--boton
 	{
-		width: 90%;
-		padding: .3em;
-	}
-	#panel-boton:checked ~ #panel-etiqueta, #panel-boton:checked, #panel-boton:checked ~ #contenido
-	{
-		margin-left: 100%;
-	}
-
-	#panel-boton:checked ~ #panel
-	{
-		opacity: 1;
+		display: block;
 		width: 100%;
 	}
-	#panel-etiqueta
+	.boton__barra
 	{
-		cursor: pointer;
-		font-size: 2em;
-		height: .65em; 
-		left: .25em;
-		position: fixed;
-		top: .25em;
-		width: 1em;
+		display: block;
+		padding: 1em;
+		background-color: rgb(12,66,113);
+		color: white;
+		text-decoration: none;
+		font-weight: bold;
+		box-sizing:border-box;
 	}
-
-	#panel-etiqueta:before
+	.menu-movil--boton span
 	{
-		background: rgb(40,106,240);
-		border-radius: .15em;
-		box-shadow: 0 .25em 0 rgb(40,106,240), 0 .5em 0 rgb(40,106,240);
-		content: "";
-		height: .15em;
-		left: 0;
-		position: absolute;
-		width: 1em;
+		float: right;
+		font-size: 2em;
 	}
 }
 
-@media screen and (max-width: 400px){
-	header nav ul li a
-	{
-		font-size: 1em;
-	}
-	main
-	{
-		margin: 0;
-		padding: 0;
-	}
-	main section
-	{
-		font-size: .8em;
-		width: 60%;
-	}
-	main section figure
-	{
-		display: none;
-	}
+
+
+$baselineheight:          1.5em;
+$gutterwidth:             24px;
+
+$basecolor:               rgb(255,148,77); 
+$secondary:               #481019;
+
+$nav-width:               44px;
+$nav-height:              $nav-width * 1.2;
+$nav-icon-size:           16px;
+$nav-color:               white;
+$nav-background:          $secondary;
+$nav-borders:             lighten($nav-background, 10%);
+$nav-lists-background:    $basecolor;
+
+body {
+  background-color:$basecolor;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+}
+/*
+ * Navegación, oculta el <ul> con su overflow:hidden .
+ */
+.nav--top {
+	position: absolute;
+	top:0;
+	left:1vw;
+    z-index: 10;
+    width:  $nav-width;
+    height: $nav-height;
+    color: $nav-color;
+    overflow: hidden;
+    cursor: pointer;
+ 
+	/**
+     * Place a hamburger (don’t hate the player, hate the game...) icon
+     * over the top of our nav element.
+     */
+    &:after {
+        content: "☰";
+        font-size: $nav-icon-size;
+        width: 1em;
+        line-height: 1;
+        text-align: center;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top:  -($nav-icon-size / 2);
+        margin-left: -($nav-icon-size / 2);
+     }   
+}
+
+  .nav--top__list {
+    list-style: none;
+    margin:  0;
+    padding: 0;
+    //Este padding top baja el contenido respecto a la hamburguesa
+    padding-top: $nav-height;
+    position: absolute;
+    top:   0;
+    left:  0;
+    background-color: $nav-background;
+    box-shadow:inset -100px -50px 100px 100px rgba(0,0,0,0.2);
+    /* 
+    * Usamos VW porque con % tomaría el tamaño del contenedor, 
+    * que es $nav-width (unos 48px) y no se ve na' e ná
+    */
+    width: 200px;
+    z-index: -1;
+    height: 80px;
+  }
+// Ocultamos el checkbox
+	 .checkbox__hack {
+	 	display: none;
+
+		/*
+	 	 * Quitamos el overflow:hidden para que se muestre el menú cuando
+       * el checkbox está :checked
+	 	 * Eso es todo, un overflow. Con eso mostramos u ocultamos el menú.
+	 	 * (Eso y el content del after para que sea una X y no la hamburguesa)
+	 	 */
+
+		&:checked {
+	 	 	~ .nav--top {
+              overflow: visible;
+              
+              &::after {
+                content:"x";
+              }
+	 	 	}
+		 }
+	 }
+
+
+ // Estilizamos el label para que aparezca JUSTO encima de la navegación
+	 .checkbox-hack__label {
+	 	position: absolute;
+		top:0;
+		left:0;
+	    z-index: 100;
+	    width:  100%;
+	    height: $nav-height;
+	    color: $nav-color;
+	    overflow: hidden;
+	    cursor: pointer;
+	    margin:0;
+	    z-index: 100;
+	 }
+
+
+// Estilos a los links, puro adorno:
+
+a, a:visited {
+    	color: $nav-color;
+        display: block;
+        padding-left:  ($nav-width - $nav-icon-size) / 2;
+        line-height: $nav-width;
+        background-image: none;
+        line-height: 2;
+        text-transform: uppercase;
+        font-size:14;
+        border-bottom: 1px solid darken($secondary, 8);
+        border-top: 1px solid lighten($secondary, 5);
+        background-color: $secondary;
+        text-shadow: 1px 1px 1px lighten($secondary, 5);
+
+        &:hover {
+        	text-decoration: none;
+        	background-color: darken($secondary, 10);
+        }
+  
 }
