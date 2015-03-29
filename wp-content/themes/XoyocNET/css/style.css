@@ -153,6 +153,10 @@ header nav ul li a:hover
 		display: block;
 		width: 100%;
 	}
+	header nav ul li a
+	{
+		font-size: 1em;
+	}
 	.menu-movil--boton
 	{
 		display: block;
