@@ -15,9 +15,8 @@ body
 }
  	.encabezado__logo--imagen
 	{
-		float: left;
-		width: 230px;
-		height: 150px;
+		width: 200px;
+		height: 100px;
 	}
 	.menu-movil
 	{
@@ -25,6 +24,9 @@ body
 		height: 10%;
 		width: 90%;
 		margin: auto;
+		display: flex;
+		justify-content:space-around;
+		align-items:center;
 	}
 	.menu-movil--boton
 	{
@@ -34,19 +36,21 @@ body
 
 header nav ul
 {
-	overflow: hidden;
+	display: flex;
+	justify-content:space-around;
+	align-items:center;
 	list-style: none;
 }
 
 header nav ul li
 {
-	float: left;
+	
 }
 
 header nav ul li a
 {
 	display: block;
-	color: rbg(193,223,251);
+	color: white;
 	font-size: 2em;
 	text-decoration: none;
 	padding: .5em;
@@ -54,14 +58,13 @@ header nav ul li a
 
 header nav ul li a:hover
 {
-	color: rbg(36,111,179);
-	border-bottom: solid .1em rgb(95,148,66);
+	background-color: rgb(95,148,66);
+	border-bottom: solid .1em white;
 }
 
-main
+.contenido
 {
-	background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(187,187,187,.5)), to(rgba(40,106,240,.5)));
-	background: gradient(linear, 0% 0%, 100% 0%, from(rgba(187,187,187,.5)), to(rgba(40,106,240,.5)));
+	background-color: rgba(193,223,253,.8);
 	font-size: 1.5em;
 	height: auto;
 	width: 95%;
@@ -70,53 +73,43 @@ main
 	max-width: 1720px;
 	overflow: hidden;
 }
+	.contenido--contenedor
+	{
+		width: 90%;
+	}
+	.contenido--imagen
+	{
+		margin: 0 1em;
+		height: 60%;
+		width: 60%;
+		float: left;
+	}
 
-main section p 
+.pie-pagina
 {
-}
-
-main section
-{
-	width: 90%;
-}
-
-main section img
-{
-	margin: 0 1em;
-	height: 60%;
-	width: 60%;
-	float: left;
-}
-
-footer
-{
-	background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(187,187,187,.5)), to(rgba(40,106,240,.5)));
-	background: gradient(linear, 0% 0%, 100% 0%, from(rgba(187,187,187,.5)), to(rgba(40,106,240,.5)));
+	background-color: rgb(36,11,179);
 	width: 95%;
 	margin: auto;
 	max-width: 1720px;
 }
-
-footer form label
-{
-	margin:auto;
-	width: 50%;
-	display: flex;
-	justify-content:space-around;
-	align-items:center;
-}
-
-footer form label input
-{
-	border-radius: .3em;
-	margin: 1em .5em;
-}
-
-footer form label textarea
-{
-	border-radius: .3em;
-	margin-top: .5em;
-}
+	.pie-pagina__formulario--contenedor
+	{
+		margin:auto;
+		width: 50%;
+		display: flex;
+		justify-content:space-around;
+		align-items:center;
+	}
+	.pie-pagina__formulario--campo-texto
+	{
+		border-radius: .3em;
+		margin: 1em .5em;
+	}
+	.pie-pagina__formulario--area-texto
+	{
+		border-radius: .3em;
+		margin-top: .5em;
+	}
 
 .animacion
 {
@@ -126,8 +119,18 @@ footer form label textarea
 
 
 @media screen and (max-width: 800px){
+	body
+	{
+		padding: 0;
+	}
+	.encabezado, .contenido, .pie-pagina
+	{
+		width: 100vw;
+		margin:0;
+	}
 	.menu-movil
 	{
+		display: block;
 		background-color: rgb(12,66,113);
 		width: 50%;
 		height: 100%;
@@ -139,17 +142,23 @@ footer form label textarea
 	{
 		float: none;
 	}
+	header nav ul
+	{
+		display: inline-block;
+		width: 80%;
+	}
 	header nav ul li
 	{
+		border-bottom: solid .1em white;
 		display: block;
-		float: none;
+		width: 100%;
 	}
 	.menu-movil--boton
 	{
 		display: block;
 		width: 100%;
 	}
-	.boton__barra
+	.menu-movil--boton .boton__barra
 	{
 		display: block;
 		padding: 1em;
@@ -157,6 +166,7 @@ footer form label textarea
 		color: white;
 		text-decoration: none;
 		font-weight: bold;
+		-webkit-box-sizing:border-box;
 		box-sizing:border-box;
 	}
 	.menu-movil--boton span
