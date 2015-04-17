@@ -1,0 +1,273 @@
+/*Theme Name: Antonio Xoyoc Becerra Farias
+Theme URI: http://xoyoc.net
+Author: Tec. Antonio Xoyoc Becerra Farias
+Author URI: http://xoyoc.net/humans.txt
+Description: Este es el tema mio para utilizarlo en WordPress
+Version: 1.0
+License: GNU General Public License v3 or later
+License URI: http://www.gnu.org/licenses/gpl-3.0.html
+Tags: Front-End, Developer, Diseño Web, Páginas Web.*/
+
+@import url(http://fonts.googleapis.com/css?family=Cabin+Condensed:400,700);
+
+body
+{
+	background: url(../img/fondo.jpg) fixed;
+	font-family: 'Cabin Condensed', sans-serif;
+	font-size: 18px;
+	padding: 2em;
+	overflow-x:hidden;
+	overflow-y:  scroll;
+	position: absolute;
+	z-index: 999;
+}
+
+header
+{
+	background: rgba(187,187,187,.5);
+	float: left;
+	width: 95%;
+}
+
+header figure
+{
+	margin: .5em;
+}
+
+header figure img
+{
+	width: 350px;
+	height: 220px;
+}
+
+header nav
+{
+	width: 75%;
+	margin: .5em;
+}
+
+header nav ul
+{
+	width: 90%;
+	margin: 0;
+}
+
+header nav ul li
+{
+	display: inline-block;
+	margin: 1em 0;
+}
+
+header nav ul li a
+{
+	font-size: 2em;
+	text-decoration: none;
+	padding: 0 .5em;
+}
+
+header nav ul li a:hover
+{
+	color: blue;
+	border-left: solid .2em red;
+}
+
+main
+{
+	background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(187,187,187,.5)), to(rgba(40,106,240,.5)));
+	background: gradient(linear, 0% 0%, 100% 0%, from(rgba(187,187,187,.5)), to(rgba(40,106,240,.5)));
+	font-size: 1.5em;
+	float: right;
+	height: auto;
+	width: 79%;
+}
+
+main section
+{
+	margin: auto;
+	width: 90%;
+	padding: 1em;
+}
+
+main section, figure
+{
+	display: inline-block;
+}
+
+main section figure img
+{
+	height: 90%;
+	width: 90%;
+}
+
+footer
+{
+	background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(187,187,187,.5)), to(rgba(40,106,240,.5)));
+	background: gradient(linear, 0% 0%, 100% 0%, from(rgba(187,187,187,.5)), to(rgba(40,106,240,.5)));
+	position: relative;
+	margin-top: -30px;
+	clear: both;
+}
+
+footer form
+{
+	margin-left: 20em;
+}
+
+footer form label input
+{
+	border-radius: .3em;
+	margin: 1em .5em;
+}
+
+footer form label textarea
+{
+	border-radius: .3em;
+	margin-top: .5em;
+}
+
+#panel-boton
+{
+	display: none;
+}
+
+.animacion
+{
+	-webkit-transition: all .3s ease-out;
+	transition: all .3s ease-out;
+}
+
+@media screen and (max-width: 1720px){
+	header
+	{
+		height: 100%;
+	}
+	header figure img
+	{
+		width: 250px;
+		height: 120px;
+	}
+	header nav ul li a
+	{
+		font-size: 1.8em;
+	}
+	main
+	{
+		height: auto;
+		padding: 1em;
+		width: 75%;
+	}
+	main figure
+	{
+		width: 90%;
+		height: 90%;
+	}
+	footer
+	{
+
+	}
+	
+}
+
+@media screen and (max-width: 1660px){
+	header figure img
+	{
+		width: 100%;
+		height: 100%;
+	}
+	header nav ul li
+	{
+		display: block;
+	}
+	main section figure img
+	{
+		width: 100%;
+		height: 500px;
+	}
+}
+
+@media screen and (max-width: 800px){
+	body
+	{
+		padding: 0;
+		margin: 0;
+	}
+	header
+	{
+		background: rgb(187,187,187);
+		margin: 0;
+		left: 0;
+		opacity: 0;
+		overflow-x: hidden;
+		height: 100%;
+		position: fixed;
+		width: 65%;
+	}
+	header figure img
+	{
+		width: 70%;
+		height: 70%;
+	}
+	header nav ul li
+	{
+		border-bottom: .2em solid rgba(255,255,255, .3)
+	}
+	main
+	{
+		width: 90%;
+		padding: .3em;
+	}
+	#panel-boton:checked ~ #panel-etiqueta, #panel-boton:checked, #panel-boton:checked ~ #contenido
+	{
+		margin-left: 65%;
+	}
+
+	#panel-boton:checked ~ #panel
+	{
+		opacity: 1;
+		width: 65%;
+	}
+	#panel-etiqueta
+	{
+		cursor: pointer;
+		font-size: 2em;
+		height: .65em; 
+		left: .25em;
+		position: fixed;
+		top: .25em;
+		width: 1em;
+		z-index: 1000;
+	}
+
+	#panel-etiqueta:before
+	{
+		background: rgb(40,106,240);
+		border-radius: .15em;
+		box-shadow: 0 .25em 0 rgb(40,106,240), 0 .5em 0 rgb(40,106,240);
+		content: "";
+		height: .15em;
+		left: 0;
+		position: absolute;
+		width: 1em;
+	}
+}
+
+@media screen and (max-width: 400px){
+	header nav ul li a
+	{
+		font-size: 1em;
+	}
+	main
+	{
+		margin: 0;
+		padding: 0;
+	}
+	main section
+	{
+		font-size: .8em;
+		width: 60%;
+	}
+	main section figure
+	{
+		display: none;
+	}
+}
