@@ -9,12 +9,10 @@
 	<link rel="shortcut icon" type="image/x-icon" href="xoyoc.ico" />
 	<link rel="apple-touch-icon" type="apple-touch-icon" href="apple-touch-xoyoc.png" />
 	<link rel="author" type="text/plain" href="humans.txt" />
-	<link rel="stylesheet" href="css/normalize.css" />
 	<link rel="stylesheet" href="css/style.css" />
-	<link rel="stylesheet" href="fonts.css">
 </head>
-<body>
-	<header class="encabezado">
+<body class="container">
+	<header class="encabezado twelve.columns">
 		<div class="menu-movil--boton">
 			<a href="#" class="boton__barra"><span class="icon-three-bars"></span> Menu</a>
 		</div>
@@ -28,7 +26,7 @@
 			</ul>
 		</nav>
 	</header>
-	<main class="contenido">
+	<main class="contenido twelve.columns">
 		<section class="contenido--contenedor">
 			<h2>Mi lugar</h2>
 			<img class="contenido--imagen" src="img/Life-Front-End-Developer-Feature_1290x688_KL.jpg" alt="responsive_design">
@@ -40,16 +38,16 @@
 			</p>
 		</section>
 	</main>
- 	<footer id="contacto" class"pie-pagina">
-	<form class"pie-pagina__formulario" action="">
+ 	<footer id="contacto" class="pie-pagina twelve.columns">
+		<form class"pie-pagina__formulario" action="">
 		<label class"pie-pagina__formulario--contenedor">
             	<input name="nombre" id="c_name" type="text" class="pie-pagina__formulario--campo-texto" placeholder="Nombre..."/>
             	<input name="email"  id="c_mail" type="email" class="pie-pagina__formulario--campo-texto" placeholder="Email..."/>
             	<textarea name="mensaje"  id="c_msg" class="pie-pagina__formulario--area-texto" placeholder="Mensaje..."></textarea>
             	<input name="send" onclick="cargaSendMail()" type="button" value="Enviar" class="btn-b" id="c_enviar"></input>
 		</label>
-	</form>
-</footer>
+		</form>
+	</footer>
 	<script src="http://code.jquery.com/jquery-latest.js"></script>
 	<script src="js/menu.js"></script>
 </body>
