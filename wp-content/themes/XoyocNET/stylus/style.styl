@@ -8,12 +8,18 @@ verdepalido=#5F9442
 azulclaro=#C1DFFD
 azulmarino=#240BB3
 
+.centrado-flex
+	display flex
+	justify-content space-around
+	align-items center
 
 body
 	background url(../img/fondo.jpg) fixed
 	font-family 'Cabin Condensed', sans-serif
 	font-size 16px
 	padding 2em
+ul
+	margin-bottom 0
 .encabezado
 	width 100%
 	height 100%
@@ -22,9 +28,6 @@ body
 		height 125px
 	.menu-movil
 		background: rgba(azulfuerte,.2)
-		display flex
-		justify-content space-around
-		align-items center
 	.menu-movil--boton
 		font-size 2em
 		display none
@@ -56,13 +59,11 @@ header nav ul li a
 		width 60%
 		float left
 .pie-pagina
-	background-color rgb(36,11,179)
+	background-color rgba(azulmarino,.6)
 	.pie-pagina__formulario--contenedor
 		margin auto
-		width 50%
-		display flex
-		justify-content space-around
-		align-items center
+		.btn-b
+			background-color verdepalido
 	.pie-pagina__formulario--campo-texto
 		border-radius .3em
 		margin 1em .5em
