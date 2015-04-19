@@ -17,7 +17,7 @@
 			<a href="#" class="boton__barra"><span class="icon-three-bars"></span>Menu</a>
 		</div>
 		<nav id="menu-movil" class="menu-movil centrado-flex">
-			<a href="<?php bloginfo("home"); ?>"><img class="encabezado__logo--imagen" src="img/logotipo.png" alt="LOGOTIPO"></a>
+			<a href="<?php bloginfo("home"); ?>"><img class="encabezado__logo--imagen" src="<?php bloginfo("template_url"); ?>/img/logotipo.png" alt="LOGOTIPO"></a>
 			<ul>
 				<li><a class="animacion" href="#diseño_web"><span class="icon-code"></span> Front-End</a></li>
 				<li><a class="animacion" href="#portafolio"><span class="icon-briefcase"></span> Portafolio</a></li>
