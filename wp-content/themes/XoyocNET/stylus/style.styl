@@ -46,6 +46,7 @@ header nav ul li a
 	&:hover
 		background-color rgb(95,148,66)
 		border-bottom solid .1em white
+		color black
 .contenido
 	background-color rgba(193,223,253,.8)
 	font-size 1.5em
@@ -59,11 +60,15 @@ header nav ul li a
 		width 60%
 		float left
 .pie-pagina
-	background-color rgba(azulmarino,.6)
+	background-color rgba(azulfuerte,.6)
 	.pie-pagina__formulario--contenedor
 		margin auto
 		.btn-b
-			background-color verdepalido
+			background-color azulmarino
+			color white
+			&:hover
+				background-color verdepalido
+				color black
 	.pie-pagina__formulario--campo-texto
 		border-radius .3em
 		margin 1em .5em
@@ -84,12 +89,12 @@ header nav ul li a
 	.encabezado, .contenido, .pie-pagina
 		margin 0
 	.encabezado__logo--imagen
-		width 150px
-		height 50px
+		width 200px
+		height 100px
 	.menu-movil
 		display block
 		background-color rgb(12,66,113)
-		width 60%
+		width 50%
 		height 100%
 		left -100%
 		margin 0
@@ -104,7 +109,7 @@ header nav ul li a
 		display block
 		width 100%
 	header nav ul li a
-		font-size 1em
+		font-size 1.5em
 	.menu-movil--boton
 		display block
 		width 100%
