@@ -4,7 +4,7 @@ Donate link: http://profiles.wordpress.org/emrevona/
 Tags: cache, caching, performance, wp-cache, optimize, minify, woocommerce, plugin, post, posts, google, ajax, comments, seo, adsense, gzip, google page speed, ylow
 
 Requires at least: 3.3
-Tested up to: 4.1
+Tested up to: 4.2
 Stable tag: 4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -77,6 +77,12 @@ Setup of this plugin is so easy. You don't need to modify the .htacces file. It 
 9. Exclude page
 
 == Changelog ==
+
+= 0.8.5.0 =
+* to prevent combine js file which is added by WP Socializer
+* to make ruleForWpContent() pasive
+* refactoring of inlineToScript()
+* Romanian has been added
 
 = 0.8.4.9 =
 * to be compatible with WP Mobile Edition

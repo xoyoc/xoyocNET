@@ -3,7 +3,7 @@
 Plugin Name: WP Fastest Cache
 Plugin URI: http://wordpress.org/plugins/wp-fastest-cache/
 Description: The simplest and fastest WP Cache system
-Version: 0.8.4.9
+Version: 0.8.5.0
 Author: Emre Vona
 Author URI: http://tr.linkedin.com/in/emrevona
 
@@ -20,11 +20,11 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */ 
 	if (!defined('WPFC_WP_CONTENT_BASENAME')) {
-		define("WPFC_WP_CONTENT_BASENAME", str_replace("/", "", basename(content_url())));
-		define("WPFC_WP_CONTENT_DIR", ABSPATH.str_replace("/", "", basename(content_url())));
 		if (!defined('WPFC_WP_PLUGIN_DIR')) {
 			define("WPFC_WP_PLUGIN_DIR", preg_replace("/(\/trunk\/|\/wp-fastest-cache\/)$/", "", plugin_dir_path( __FILE__ )));
 		}
+		define("WPFC_WP_CONTENT_DIR", dirname(WPFC_WP_PLUGIN_DIR));
+		define("WPFC_WP_CONTENT_BASENAME", basename(WPFC_WP_CONTENT_DIR));
 	}
 
 	if (!defined('WPFC_MAIN_PATH')) {
@@ -42,7 +42,22 @@ GNU General Public License for more details.
 												  "wpfc_optimize_image_ajax_request",
 												  "wpfc_update_image_list_ajax_request"
 												  );
-			if(isset($_GET) && isset($_GET["action"]) && $_GET["action"] == "wpfc_check_url_ajax_request"){
+
+			if(isset($_POST) && isset($_POST["action"]) && $_POST["action"] == "wpfc_remove_cdn_integration_ajax_request"){
+				delete_option("WpFastestCacheCDN");
+				echo json_encode(array("success" => true));
+				exit;
+
+			}else if(isset($_POST) && isset($_POST["action"]) && $_POST["action"] == "wpfc_save_cdn_integration_ajax_request"){
+				$values = json_encode($_POST["values"]);
+				if(get_option("WpFastestCacheCDN")){
+					update_option("WpFastestCacheCDN", $values);
+				}else{
+					add_option("WpFastestCacheCDN", $values, null, "yes");
+				}
+				echo json_encode(array("success" => true));
+				exit;
+			}else if(isset($_GET) && isset($_GET["action"]) && $_GET["action"] == "wpfc_check_url_ajax_request"){
 				$_GET["url"] = strip_tags($_GET["url"]);
 				$_GET["url"] = str_replace(array("'", '"'), "", $_GET["url"]);
 				
@@ -121,19 +136,19 @@ GNU General Public License for more details.
 											$result = activate_plugin( 'wp-fastest-cache-premium/wpFastestCachePremium.php' );
 
 											if ( is_wp_error( $result ) ) {
-												$res = array("success" => false, "error_message" => "Error occured while the plugin was activated", "error_code" => 1); 
+												$res = array("success" => false, "error_message" => "Error occured while the plugin was activated", "error_code" => 1, "file_url" => $wpfc_premium_download_link); 
 											}else{
 												$res = array("success" => true);
 												$this->deleteCache(true);
 											}
 										} else {
-											$res = array("success" => false, "error_message" => 'Error occured while the file was unzipped', "error_code" => 2);      
+											$res = array("success" => false, "error_message" => 'Error occured while the file was unzipped', "error_code" => 2, "file_url" => $wpfc_premium_download_link);      
 										}
 									}else{
-										$res = array("success" => false, "error_message" => "unzip_file() is not found", "error_code" => 3);
+										$res = array("success" => false, "error_message" => "unzip_file() is not found", "error_code" => 3, "file_url" => $wpfc_premium_download_link);
 									}
 								}else{
-									$res = array("success" => false, "error_message" => "/wp-content/plugins/ is not writable", "error_code" => 4);
+									$res = array("success" => false, "error_message" => "/wp-content/plugins/ is not writable", "error_code" => 4, "file_url" => $wpfc_premium_download_link);
 								}
 							}else{
 								$res = array("success" => false, "error_message" => "Error: Service is unavailable. Try later...");

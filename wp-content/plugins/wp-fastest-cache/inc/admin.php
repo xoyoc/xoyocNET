@@ -214,8 +214,8 @@
 			wp_enqueue_script("wpfc-dialog", plugins_url("wp-fastest-cache/js/dialog.js"), array(), time(), false);
 
 
-			//wp_enqueue_script("wpfc-cdn", plugins_url("wp-fastest-cache/js/cdn/cdn.js"), array(), time(), false);
-			//wp_enqueue_script("wpfc-cdn-maxcdn", plugins_url("wp-fastest-cache/js/cdn/maxcdn.js"), array(), time(), false);
+			wp_enqueue_script("wpfc-cdn", plugins_url("wp-fastest-cache/js/cdn/cdn.js"), array(), time(), false);
+			wp_enqueue_script("wpfc-cdn-maxcdn", plugins_url("wp-fastest-cache/js/cdn/maxcdn.js"), array(), time(), false);
 
 
 			wp_enqueue_script("wpfc-language", plugins_url("wp-fastest-cache/js/language.js"), array(), time(), false);
@@ -702,7 +702,13 @@
 
 						array_push($tabs, array("id"=>"wpfc-exclude","title"=>"Exclude"));
 
-						//array_push($tabs, array("id"=>"wpfc-cdn","title"=>"CDN"));
+						$cdn_tester_list = array("berkatan.com", 
+												"teknooneri.com",
+												"poweryourinvestment.com",
+												"smartlist.ee");
+						if(in_array(str_replace("www.", "", $_SERVER["HTTP_HOST"]), $cdn_tester_list)){
+							array_push($tabs, array("id"=>"wpfc-cdn","title"=>"CDN"));
+						}
 
 						foreach ($tabs as $key => $value){
 							$checked = "";
@@ -869,7 +875,7 @@
 									  <option value="ja">日本語</option>
 									  <option value="pt">Português</option>
 									  <option value="ru">Русский</option>
-									  <!-- <option value="ro">Română</option> -->
+									  <option value="ro">Română</option>
 									  <option value="tr">Türkçe</option>
 									  <!-- <option value="ukr">Українська</option> -->
 									</select> 
@@ -1121,6 +1127,10 @@
 				    		if(!get_option("WpFc_api_key")){
 				    			update_option("WpFc_api_key", md5(microtime(true)));
 				    		}
+
+				    		if(!defined('WPFC_API_KEY')){ // for download_error.php
+				    			define("WPFC_API_KEY", get_option("WpFc_api_key"));
+				    		}
 				    	?>
 				    	<style type="text/css">
 				    		#wpfc-premium-container{
@@ -1304,30 +1314,45 @@
 																if(data.success){
 																	 location.reload();
 																}else{
-																	var warning_box = jQuery("#wpfc-plugin-setup-warning");
-																	var message = "";
-																	wpfc.dictionary = typeof wpfc.dictionary != "undefined" ? wpfc.dictionary : [];
+																	console.log(data, "data");
+																	if(jQuery("#wpfc-download-premium-button span").text().match(/update/i)){
+																		jQuery.get("<?php echo plugins_url('wp-fastest-cache/templates'); ?>/update_error.php?url=" + data.file_url, function( data ) {
+																			jQuery("body").append(data);
+																			Wpfc_Dialog.dialog("wpfc-modal-downloaderror");
+																			jQuery("#revert-loader-toolbar").hide();
+																		});
+																	}else{
+																		jQuery.get("<?php echo plugins_url('wp-fastest-cache/templates'); ?>/download_error.php?url=" + data.file_url, function( data ) {
+																			jQuery("body").append(data);
+																			Wpfc_Dialog.dialog("wpfc-modal-downloaderror");
+																			jQuery("#revert-loader-toolbar").hide();
+																		});
+																	}
+
+																	// var warning_box = jQuery("#wpfc-plugin-setup-warning");
+																	// var message = "";
+																	// wpfc.dictionary = typeof wpfc.dictionary != "undefined" ? wpfc.dictionary : [];
 																	
-																	message += typeof wpfc.dictionary[data.error_message] != "undefined" ? wpfc.dictionary[data.error_message] : data.error_message;
-																	message += ". ";
-																	message += typeof wpfc.dictionary["You need to activate the premium plugin manually"] != "undefined" ? wpfc.dictionary["You need to activate the premium plugin manually"] : "You need to activate the premium plugin manually";
-																	message += ". ";
-																	message += typeof wpfc.dictionary["Please read the tutorial"] != "undefined" ? wpfc.dictionary["Please read the tutorial"] : "Please read the tutorial"; 
-																	message += ". ";
+																	// message += typeof wpfc.dictionary[data.error_message] != "undefined" ? wpfc.dictionary[data.error_message] : data.error_message;
+																	// message += ". ";
+																	// message += typeof wpfc.dictionary["You need to activate the premium plugin manually"] != "undefined" ? wpfc.dictionary["You need to activate the premium plugin manually"] : "You need to activate the premium plugin manually";
+																	// message += ". ";
+																	// message += typeof wpfc.dictionary["Please read the tutorial"] != "undefined" ? wpfc.dictionary["Please read the tutorial"] : "Please read the tutorial"; 
+																	// message += ". ";
 
-																	warning_box.find(".fieldRow").text(message);
-																	warning_box.find("#wpfc-read-tutorial").click(function(){
-																		warning_box.hide();
-																		var win = window.open("http://www.wpfastestcache.com/warnings/how-to-activate-premium-version-manually/", '_blank');
-																		win.focus();
-																	});
+																	// warning_box.find(".fieldRow").text(message);
+																	// warning_box.find("#wpfc-read-tutorial").click(function(){
+																	// 	warning_box.hide();
+																	// 	var win = window.open("http://www.wpfastestcache.com/warnings/how-to-activate-premium-version-manually/", '_blank');
+																	// 	win.focus();
+																	// });
 
-																	var windowHeight = 70;//(jQuery(window).height() - warning_box.height())/2;
-																	var windowWidth = (jQuery(window).width() - warning_box.width())/2;
+																	// var windowHeight = 70;//(jQuery(window).height() - warning_box.height())/2;
+																	// var windowWidth = (jQuery(window).width() - warning_box.width())/2;
 
-																	warning_box.css({"top": windowHeight, "left": windowWidth, "display" : "block", "position" : "fixed"});
+																	// warning_box.css({"top": windowHeight, "left": windowWidth, "display" : "block", "position" : "fixed"});
 
-																	jQuery("#revert-loader-toolbar").hide();
+																	// jQuery("#revert-loader-toolbar").hide();
 
 																}
 																console.log(data, "data");
@@ -1544,7 +1569,7 @@
 						}
 
 				    	</style>
-				    	<h2 style="padding-bottom:10px;">CDN Settings</h2>
+				    	<h2 style="padding-bottom:10px;">CDN Settings (BETA)</h2>
 				    	<div>
 				    		<div class="integration-page" style="display: block;width:98%;float:left;">
 				    			<div wpfc-cdn-name="maxcdn" class="int-item">
@@ -1554,29 +1579,29 @@
 				    					<p>Experts in Content Delivery Network Services</p>
 				    				</div>
 				    				<div class="meta">
-				    					<span class="connected">Connected</span>
+				    					<span class="connected"></span>
 				    				</div>
 				    			</div>
 				    		</div>
 				    	</div>
 				    	<script type="text/javascript">
-				    		// (function() {
-					    	// 	<?php
-					    	// 		$cdn_values = get_option("WpFastestCacheCDN");
-					    	// 		if($cdn_values){
-					    	// 			$cdn_values_arr = json_decode($cdn_values);
-					    	// 			?>
-					    	// 				jQuery("div[wpfc-cdn-name='<?php echo $cdn_values_arr->id;?>']").find("span.connected").text("Connected");
-					    	// 			<?php
-					    	// 		}
-					    	// 	?>
-				    		// 	jQuery(".int-item").click(function(e){
-				    		// 		WpfcMaxCDN.init({"id" : jQuery(e.currentTarget).attr("wpfc-cdn-name"),
-				    		// 			"template_main_url" : "<?php echo plugins_url('wp-fastest-cache/templates'); ?>",
-				    		// 			"values" : <?php echo $cdn_values ? $cdn_values : '""'; ?>
-				    		// 		});
-				    		// 	});
-				    		// })();
+				    		(function() {
+					    		<?php
+					    			$cdn_values = get_option("WpFastestCacheCDN");
+					    			if($cdn_values){
+					    				$cdn_values_arr = json_decode($cdn_values);
+					    				?>
+					    					jQuery("div[wpfc-cdn-name='<?php echo $cdn_values_arr->id;?>']").find("span.connected").text("Connected");
+					    				<?php
+					    			}
+					    		?>
+				    			jQuery(".int-item").click(function(e){
+				    				WpfcMaxCDN.init({"id" : jQuery(e.currentTarget).attr("wpfc-cdn-name"),
+				    					"template_main_url" : "<?php echo plugins_url('wp-fastest-cache/templates'); ?>",
+				    					"values" : <?php echo $cdn_values ? $cdn_values : '""'; ?>
+				    				});
+				    			});
+				    		})();
 				    	</script>
 				    </div>
 
