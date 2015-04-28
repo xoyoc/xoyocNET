@@ -23,7 +23,7 @@
 					'container' => 'nav',
 					'container_class' => 'menu-movil centrado-flex',
 					'menu_class' => 'nav__list',
-					'link_after' => '<span class="icon-code"></span>'
+					'link_before' => '<span class="icon-code"> </span>'
 					)
 			 );	
 		 ?>
