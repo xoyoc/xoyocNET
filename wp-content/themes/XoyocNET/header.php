@@ -18,7 +18,6 @@
 		</div>
 		<?php 
 			wp_nav_menu(
-				<a href="<?php bloginfo("home"); ?>"><img class="encabezado__logo--imagen" src="<?php bloginfo("template_url"); ?>/img/logotipo.png" alt="LOGOTIPO"></a>
 				array(
 					'theme_location' => 'menu-header',
 					'container' => 'nav',
