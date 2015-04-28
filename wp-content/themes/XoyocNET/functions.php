@@ -1,14 +1,15 @@
 <?php
+	// IMAGENES DESTACADAS
 	add_theme_support("post-thumbnails");
-	$menus = array(
-		"menu_principal"=>"Menú Principal",
-		"menu_social"=>"Menú Social"
-	);
-	register_nav_menus($menus);
-/*	function extracto_mas()
-	{
-		$enlace = "<a href='".get_permalink()."'><b> leer más...</b></a>";
-		return $enlace;
+	// MENU DE MI PAGINA WEB
+	function register_my_menu(){
+		register_nav_menus(
+			array(
+					'menu-header'=> ___('Menu de encabezado'),
+					'menu-footer'=> ___('Menu de pie de pagina')
+				)
+		 );
 	}
-	add_filter("excerpt_more","extracto_mas");*/
-?>
+	add_action('init', 'register_my_menus');
+
+

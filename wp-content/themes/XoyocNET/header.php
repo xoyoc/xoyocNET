@@ -16,7 +16,14 @@
 		<div class="menu-movil--boton">
 			<a href="#" class="boton__barra"><span class="icon-three-bars"></span>Menu</a>
 		</div>
-		<nav id="menu-movil" class="menu-movil centrado-flex">
+		<?php 
+			wp_nav_menu(
+				array(
+					'theme_location' => 'menu-header'
+					)
+			 );	
+		 ?>
+<!-- 		<nav id="menu-movil" class="menu-movil centrado-flex">
 			<a href="<?php bloginfo("home"); ?>"><img class="encabezado__logo--imagen" src="<?php bloginfo("template_url"); ?>/img/logotipo.png" alt="LOGOTIPO"></a>
 			<ul>
 				<li><a class="animacion" href="#diseño_web"><span class="icon-code"></span> Front-End</a></li>
@@ -24,6 +31,6 @@
 				<li><a class="animacion" href="#blog"><span class="icon-comment-discussion"></span> Blog</a></li>
 				<li><a class="animacion" href="#contacto"><span class="icon-organization"></span> Contacto</a></li>
 			</ul>
-		</nav>
+		</nav> -->
 	</header>
 	<main class="contenido twelve.columns">
