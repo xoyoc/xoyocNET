@@ -6,11 +6,20 @@
 <?php
 	list( $total, $uris ) = wp_statistics_get_top_pages();
 
-	$daysToDisplay = 20;
+	$daysToDisplay = 20; 
+	if( array_key_exists('hitdays',$_GET) ) { $daysToDisplay = intval($_GET['hitdays']); }
+
+	if( array_key_exists('rangestart', $_GET ) ) { $rangestart = $_GET['rangestart']; } else { $rangestart = ''; }
+	if( array_key_exists('rangeend', $_GET ) ) { $rangeend = $_GET['rangeend']; } else { $rangeend = ''; }
+
+	list( $daysToDisplay, $rangestart_utime, $rangeend_utime ) = wp_statistics_date_range_calculator( $daysToDisplay, $rangestart, $rangeend );
 ?>
 <div class="wrap">
 	<?php screen_icon('options-general'); ?>
 	<h2><?php _e('Top Pages', 'wp_statistics'); ?></h2>
+
+	<?php wp_statistics_date_range_selector( 'wps_pages_menu', $daysToDisplay ); ?>
+
 	<div class="postbox-container" id="last-log">
 		<div class="metabox-holder">
 			<div class="meta-box-sortables">
@@ -34,7 +43,7 @@
 									for( $i=$daysToDisplay; $i>=0; $i--) {
 										$stat = wp_statistics_pages('-'.$i,$uri[0]);
 										
-										echo "['" . $WP_Statistics->Current_Date('Y-m-d', '-'.$i) . "'," . $stat . "], ";
+										echo "['" . $WP_Statistics->Real_Current_Date('Y-m-d', '-'.$i, $rangeend_utime) . "'," . $stat . "], ";
 										
 									}
 
@@ -42,6 +51,8 @@
 									if( $count > 4 ) { break; }
 								}
 								
+								$tickInterval = $daysToDisplay / 20;
+								if( $tickInterval < 1 ) { $tickInterval = 1; }
 ?>
 
 							pages_jqchart = jQuery.jqplot('jqpage-stats', [pages_data_line1, pages_data_line2, pages_data_line3, pages_data_line4, pages_data_line5], {
@@ -53,9 +64,9 @@
 									},
 								axes: {
 									xaxis: {
-											min: '<?php echo $WP_Statistics->Current_Date('Y-m-d', '-'.$daysToDisplay);?>',
-											max: '<?php echo $WP_Statistics->Current_Date('Y-m-d', '');?>',
-											tickInterval: '1 day',
+											min: '<?php echo $WP_Statistics->Real_Current_Date('Y-m-d', '-'.$daysToDisplay, $rangeend_utime);?>',
+											max: '<?php echo $WP_Statistics->Real_Current_Date('Y-m-d', '-0', $rangeend_utime);?>',
+											tickInterval: '<?php echo $tickInterval?> day',
 											renderer:jQuery.jqplot.DateAxisRenderer,
 											tickRenderer: jQuery.jqplot.CanvasAxisTickRenderer,
 											tickOptions: { 
@@ -67,7 +78,7 @@
 									yaxis: {
 											min: 0,
 											padMin: 1.0,
-											label: '<?php echo htmlentities(__('Number of Hits', 'wp_statistics'), ENT_QUOTES); ?>',
+											label: <?php echo json_encode(__('Number of Hits', 'wp_statistics')); ?>,
 											labelRenderer: jQuery.jqplot.CanvasAxisLabelRenderer,
 											labelOptions: {
 												angle: -90,
@@ -81,7 +92,7 @@
 									show: true,
 									location: 's',
 									placement: 'outsideGrid',
-									labels: [ 'Rank #1', 'Rank #2', 'Rank #3', 'Rank #4', 'Rank #5'],
+									labels: [ <?php echo json_encode(__('Rank #1', 'wp_statistics'));?>, <?php echo json_encode(__('Rank #2', 'wp_statistics'));?>, <?php echo json_encode(__('Rank #3', 'wp_statistics'));?>, <?php echo json_encode(__('Rank #4', 'wp_statistics'));?>, <?php echo json_encode(__('Rank #5', 'wp_statistics'));?> ],
 									renderer: jQuery.jqplot.EnhancedLegendRenderer,
 									rendererOptions:
 										{

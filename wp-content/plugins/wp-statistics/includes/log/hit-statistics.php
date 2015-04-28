@@ -7,17 +7,17 @@
 	<?php screen_icon('options-general'); ?>
 	<h2><?php _e('Hit Statistics', 'wp_statistics'); ?></h2>
 
-	<ul class="subsubsub">
-		<?php $daysToDisplay = 20; if( array_key_exists('hitdays',$_GET) ) { if( $_GET['hitdays'] > 0 ) { $daysToDisplay = intval($_GET['hitdays']); } }?>
-		<li class="all"><a <?php if($daysToDisplay == 10) { echo 'class="current"'; } ?>href="?page=wps_hits_menu&hitdays=10"><?php _e('10 Days', 'wp_statistics'); ?></a></li>
-		| <li class="all"><a <?php if($daysToDisplay == 20) { echo 'class="current"'; } ?>href="?page=wps_hits_menu&hitdays=20"><?php _e('20 Days', 'wp_statistics'); ?></a></li>
-		| <li class="all"><a <?php if($daysToDisplay == 30) { echo 'class="current"'; } ?>href="?page=wps_hits_menu&hitdays=30"><?php _e('30 Days', 'wp_statistics'); ?></a></li>
-		| <li class="all"><a <?php if($daysToDisplay == 60) { echo 'class="current"'; } ?>href="?page=wps_hits_menu&hitdays=60"><?php _e('2 Months', 'wp_statistics'); ?></a></li>
-		| <li class="all"><a <?php if($daysToDisplay == 90) { echo 'class="current"'; } ?>href="?page=wps_hits_menu&hitdays=90"><?php _e('3 Months', 'wp_statistics'); ?></a></li>
-		| <li class="all"><a <?php if($daysToDisplay == 180) { echo 'class="current"'; } ?>href="?page=wps_hits_menu&hitdays=180"><?php _e('6 Months', 'wp_statistics'); ?></a></li>
-		| <li class="all"><a <?php if($daysToDisplay == 270) { echo 'class="current"'; } ?>href="?page=wps_hits_menu&hitdays=270"><?php _e('9 Months', 'wp_statistics'); ?></a></li>
-		| <li class="all"><a <?php if($daysToDisplay == 365) { echo 'class="current"'; } ?>href="?page=wps_hits_menu&hitdays=365"><?php _e('1 Year', 'wp_statistics'); ?></a></li>
-	</ul>
+	<?php 
+		$daysToDisplay = 20; 
+		if( array_key_exists('hitdays',$_GET) ) { $daysToDisplay = intval($_GET['hitdays']); }
+
+		if( array_key_exists('rangestart', $_GET ) ) { $rangestart = $_GET['rangestart']; } else { $rangestart = ''; }
+		if( array_key_exists('rangeend', $_GET ) ) { $rangeend = $_GET['rangeend']; } else { $rangeend = ''; }
+
+		list( $daysToDisplay, $rangestart_utime, $rangeend_utime ) = wp_statistics_date_range_calculator( $daysToDisplay, $rangestart, $rangeend );
+	
+		wp_statistics_date_range_selector( 'wps_hits_menu', $daysToDisplay );
+	?>
 
 	<div class="postbox-container" style="width: 100%; float: left; margin-right:20px">
 		<div class="metabox-holder">
@@ -35,7 +35,7 @@
 								for( $i=$daysToDisplay; $i>=0; $i--) {
 									$stat = wp_statistics_visit('-'.$i, true);
 									
-									echo "['" . $WP_Statistics->Current_Date('Y-m-d', '-'.$i) . "'," . $stat . "], ";
+									echo "['" . $WP_Statistics->Real_Current_Date('Y-m-d', '-'.$i, $rangeend_utime) . "'," . $stat . "], ";
 									
 								}
 
@@ -46,7 +46,7 @@
 								for( $i=$daysToDisplay; $i>=0; $i--) {
 									$stat = wp_statistics_visitor('-'.$i, true);
 									
-									echo "['" . $WP_Statistics->Current_Date('Y-m-d', '-'.$i) . "'," . $stat . "], ";
+									echo "['" . $WP_Statistics->Real_Current_Date('Y-m-d', '-'.$i, $rangeend_utime) . "'," . $stat . "], ";
 									
 								}
 
@@ -64,8 +64,8 @@
 									},
 								axes: {
 									xaxis: {
-											min: '<?php echo $WP_Statistics->Current_Date('Y-m-d', '-'.$daysToDisplay);?>',
-											max: '<?php echo $WP_Statistics->Current_Date('Y-m-d', '');?>',
+											min: '<?php echo $WP_Statistics->Real_Current_Date('Y-m-d', '-'.$daysToDisplay, $rangeend_utime);?>',
+											max: '<?php echo $WP_Statistics->Real_Current_Date('Y-m-d', '-0', $rangeend_utime);?>',
 											tickInterval: '<?php echo $tickInterval?> day',
 											renderer:jQuery.jqplot.DateAxisRenderer,
 											tickRenderer: jQuery.jqplot.CanvasAxisTickRenderer,
@@ -92,7 +92,7 @@
 									show: true,
 									location: 's',
 									placement: 'outsideGrid',
-									labels: ['<?php echo json_encode(__('Visit', 'wp_statistics')); ?>', '<?php echo json_encode(__('Visitor', 'wp_statistics')); ?>'],
+									labels: [<?php echo json_encode(__('Visit', 'wp_statistics')); ?>, <?php echo json_encode(__('Visitor', 'wp_statistics')); ?>],
 									renderer: jQuery.jqplot.EnhancedLegendRenderer,
 									rendererOptions:
 										{

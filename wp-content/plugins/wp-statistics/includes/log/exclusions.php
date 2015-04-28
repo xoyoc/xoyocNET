@@ -8,7 +8,13 @@
 		echo "<div class='updated settings-error'><p><strong>" . __('Attention: Exclusion are not currently set to be recorded, the results below may not reflect current statistics!', 'wp_statistics') . "</strong></p></div>";
 	}
 
-	$daysToDisplay = 20; if( array_key_exists('hitdays',$_GET) ) { if( $_GET['hitdays'] > 0 ) { $daysToDisplay = intval($_GET['hitdays']); } }
+	$daysToDisplay = 20; 
+	if( array_key_exists('hitdays',$_GET) ) { $daysToDisplay = intval($_GET['hitdays']); }
+
+	if( array_key_exists('rangestart', $_GET ) ) { $rangestart = $_GET['rangestart']; } else { $rangestart = ''; }
+	if( array_key_exists('rangeend', $_GET ) ) { $rangeend = $_GET['rangeend']; } else { $rangeend = ''; }
+
+	list( $daysToDisplay, $rangestart_utime, $rangeend_utime ) = wp_statistics_date_range_calculator( $daysToDisplay, $rangestart, $rangeend );
 
 	$total_stats = $WP_Statistics->get_option( 'chart_totals' );
 	
@@ -28,7 +34,7 @@
 		for( $i=$daysToDisplay; $i>=0; $i--) {
 		
 			// We're looping through the days backwards, so let's fine out what date we want to look at.
-			$thisdate = $WP_Statistics->current_date('Y-m-d', '-'.$i );
+			$thisdate = $WP_Statistics->real_current_date('Y-m-d', '-'.$i, $rangeend_utime );
 		
 			// Create the SQL query string to get the data.
 			$query = "SELECT count FROM {$wpdb->prefix}statistics_exclusions WHERE reason = '{$thisreason}' AND date = '{$thisdate}'";
@@ -55,16 +61,7 @@
 	<?php screen_icon('options-general'); ?>
 	<h2><?php _e('Exclusions Statistics', 'wp_statistics'); ?></h2>
 
-	<ul class="subsubsub">
-		<li class="all"><a <?php if($daysToDisplay == 10) { echo 'class="current"'; } ?>href="?page=wps_exclusions_menu&hitdays=10"><?php _e('10 Days', 'wp_statistics'); ?></a></li>
-		| <li class="all"><a <?php if($daysToDisplay == 20) { echo 'class="current"'; } ?>href="?page=wps_exclusions_menu&hitdays=20"><?php _e('20 Days', 'wp_statistics'); ?></a></li>
-		| <li class="all"><a <?php if($daysToDisplay == 30) { echo 'class="current"'; } ?>href="?page=wps_exclusions_menu&hitdays=30"><?php _e('30 Days', 'wp_statistics'); ?></a></li>
-		| <li class="all"><a <?php if($daysToDisplay == 60) { echo 'class="current"'; } ?>href="?page=wps_exclusions_menu&hitdays=60"><?php _e('2 Months', 'wp_statistics'); ?></a></li>
-		| <li class="all"><a <?php if($daysToDisplay == 90) { echo 'class="current"'; } ?>href="?page=wps_exclusions_menu&hitdays=90"><?php _e('3 Months', 'wp_statistics'); ?></a></li>
-		| <li class="all"><a <?php if($daysToDisplay == 180) { echo 'class="current"'; } ?>href="?page=wps_exclusions_menu&hitdays=180"><?php _e('6 Months', 'wp_statistics'); ?></a></li>
-		| <li class="all"><a <?php if($daysToDisplay == 270) { echo 'class="current"'; } ?>href="?page=wps_exclusions_menu&hitdays=270"><?php _e('9 Months', 'wp_statistics'); ?></a></li>
-		| <li class="all"><a <?php if($daysToDisplay == 365) { echo 'class="current"'; } ?>href="?page=wps_exclusions_menu&hitdays=365"><?php _e('1 Year', 'wp_statistics'); ?></a></li>
-	</ul>
+	<?php wp_statistics_date_range_selector( 'wps_exclusions_menu', $daysToDisplay ); ?>
 
 	<br><br>
 	<h3><?php echo sprintf(__('Total Exclusions: %s', 'wp_statistics'), $excluded_total); ?></h3>
@@ -85,7 +82,7 @@
 									echo "var excluded_data_line_" . $excluded_reason_tags[$reason] . " = [";
 
 									for( $i=$daysToDisplay; $i>=0; $i--) {
-										echo "['" . $WP_Statistics->Current_Date('Y-m-d', '-'.$i) . "'," . $excluded_results[$reason][$i] . "], ";
+										echo "['" . $WP_Statistics->Real_Current_Date('Y-m-d', '-'.$i, $rangeend_utime) . "'," . $excluded_results[$reason][$i] . "], ";
 										}
 
 									echo "];\n";
@@ -103,8 +100,8 @@
 									},
 								axes: {
 									xaxis: {
-											min: '<?php echo $WP_Statistics->Current_Date('Y-m-d', '-'.$daysToDisplay);?>',
-											max: '<?php echo $WP_Statistics->Current_Date('Y-m-d', '');?>',
+											min: '<?php echo $WP_Statistics->Real_Current_Date('Y-m-d', '-'.$daysToDisplay, $rangeend_utime);?>',
+											max: '<?php echo $WP_Statistics->Real_Current_Date('Y-m-d', '-0', $rangeend_utime);?>',
 											tickInterval: '<?php echo $tickInterval?> day',
 											renderer:jQuery.jqplot.DateAxisRenderer,
 											tickRenderer: jQuery.jqplot.CanvasAxisTickRenderer,

@@ -33,7 +33,7 @@
 <?php
 		$search_result_count = count( $search_result );
 		$i = 0;
-		$separator = '|';
+		$separator = ' | ';
 		
 		foreach( $search_result as $key => $value ) {
 			$i++;
@@ -53,7 +53,7 @@
 				$translate = $search_engines[$key]['translated'];
 				}
 			
-			echo "<li><a href='?page=wps_words_menu&referred={$tag}'>" . $translate . " <span class='count'>({$value})</span></a>{$separator}</li>";
+			echo "<li><a href='?page=wps_words_menu&referred={$tag}'>" . $translate . " <span class='count'>({$value})</span></a></li>{$separator}";
 		}
 ?>
 	</ul>
@@ -88,8 +88,8 @@
 									}
 									
 									$result = $wpdb->get_results("SELECT * FROM `{$wpdb->prefix}statistics_visitor` WHERE {$search_query} ORDER BY `{$wpdb->prefix}statistics_visitor`.`ID` DESC  LIMIT {$start}, {$end}");
-									
-									include_once( dirname( __FILE__ ) . "/../functions/country-codes.php");
+
+									$ISOCountryCode = $WP_Statistics->get_country_codes();
 									
 									$dash_icon = wp_statistics_icons('dashicons-location-alt', 'map');
 									
