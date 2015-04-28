@@ -2,7 +2,7 @@
 	// IMAGENES DESTACADAS
 	add_theme_support("post-thumbnails");
 	// MENU DE MI PAGINA WEB
-	function register_my_menus(){
+	function register_my_menu(){
 		register_nav_menus(
 			array(
 					'menu-header'=> ___('Menu de encabezado'),
@@ -10,6 +10,6 @@
 				)
 		 );
 	}
-	add_action('init', 'register_my_menus');
+	add_action('init', 'register_my_menu');
 
 
