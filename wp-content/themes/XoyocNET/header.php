@@ -21,10 +21,10 @@
 				<a href="<?php bloginfo("home"); ?>"><img class="encabezado__logo--imagen" src="<?php bloginfo("template_url"); ?>/img/logotipo.png" alt="LOGOTIPO"></a>
 				array(
 					'theme_location' => 'menu-header',
-					'after' => '<span class="icon-code"></span>'
 					'container' => 'nav',
 					'container_class' => 'menu-movil centrado-flex',
-					'menu_class' => 'nav__list'
+					'menu_class' => 'nav__list',
+					'link_after' => '<span class="icon-code"></span>'
 					)
 			 );	
 		 ?>
