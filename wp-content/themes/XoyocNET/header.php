@@ -19,7 +19,10 @@
 		<?php 
 			wp_nav_menu(
 				array(
-					'theme_location' => 'menu-header'
+					'theme_location' => 'menu-header',
+					'container' => 'nav',
+					'container_class' => 'menu-movil centrado-flex',
+					'menu_class' => 'nav__list'
 					)
 			 );	
 		 ?>
