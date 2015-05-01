@@ -1,7 +1,7 @@
 	</main>
  	<footer id="contacto" class="pie-pagina twelve.columns">
 		<form class="pie-pagina__formulario" action="">
-		<label class="pie-pagina__formulario--contenedor centrado-flex">
+		<label class="pie-pagina__formulario--contenedor">
 				<div class="row">
 	            	<input name="nombre" id="c_name" type="text" class="pie-pagina__formulario--campo-texto six columns" placeholder="Nombre..."/>
 	            	<input name="email"  id="c_mail" type="email" class="pie-pagina__formulario--campo-texto six columns" placeholder="Email..."/>
