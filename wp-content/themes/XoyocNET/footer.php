@@ -7,9 +7,9 @@
 	            	<input name="email"  id="c_mail" type="email" class="pie-pagina__formulario--campo-texto six columns" placeholder="Email..."/>
 				</div>
 				<div class="row">
-            		<textarea name="mensaje"  id="c_msg" class="pie-pagina__formulario--area-texto twelve.columns" placeholder="Mensaje..."></textarea>
+            		<textarea name="mensaje"  id="c_msg" class="pie-pagina__formulario--area-texto nine columns" placeholder="Mensaje..."></textarea>
+            		<input name="send" onclick="cargaSendMail()" type="button" value="Enviar" class="btn-b three columns" id="c_enviar"></input>
 				</div>
-            	<input name="send" onclick="cargaSendMail()" type="button" value="Enviar" class="btn-b" id="c_enviar"></input>
 		</label>
 		</form>
 	</footer>
