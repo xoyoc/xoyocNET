@@ -6,13 +6,13 @@ function main (){
 	$('.boton__barra').click(function(){
 		// /*$('.menu-movil').toggle();*/
 		if(contador == 1){
-			$('nav').animate({
+			$('.menu-movil').animate({
 				left:'0'
 			});
 			contador = 0;
 		} else {
 			contador = 1;
-			$('nav').animate({
+			$('.menu-movil').animate({
 				left:'-100%'
 			});
 		};
