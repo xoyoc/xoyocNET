@@ -23,7 +23,8 @@
 					'container' => 'nav',
 					'container_class' => 'menu-movil centrado-flex',
 					'menu_class' => 'nav__list',
-					'link_before' => '<span class="icon-code"> </span>'
+					'link_before' => '<span class="icon-code"> </span>',
+					'before' => '<a href="<?php bloginfo("home"); ?>"><img class="encabezado__logo--imagen" src="<?php bloginfo("template_url"); ?>/img/logotipo.png" alt="LOGOTIPO"></a>'
 					)
 			 );	
 		 ?>
