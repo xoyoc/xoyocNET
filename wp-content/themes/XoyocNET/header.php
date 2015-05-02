@@ -16,14 +16,14 @@
 		<div class="menu-movil--boton">
 			<a href="#" class="boton__barra"><span class="icon-three-bars"></span>Menu</a>
 		</div>
-		<div class="menu-movil">
+		<div class="menu-movil centrado-flex">
 			<a href="<?php bloginfo("home"); ?>"><img class="encabezado__logo--imagen" src="<?php bloginfo("template_url"); ?>/img/logotipo.png" alt="LOGOTIPO"></a>
 			<?php 
 				wp_nav_menu(
 					array(
 						'theme_location' => 'menu-header',
 						'container' => 'nav',
-						'container_class' => 'centrado-flex',
+						'container_class' => 'menu-movil__principal',
 						'menu_class' => 'nav__list',
 						'link_before' => '<span class="icon-code"> </span>'
 						)
