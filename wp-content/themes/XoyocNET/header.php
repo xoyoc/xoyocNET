@@ -16,18 +16,20 @@
 		<div class="menu-movil--boton">
 			<a href="#" class="boton__barra"><span class="icon-three-bars"></span>Menu</a>
 		</div>
-		<a href="<?php bloginfo("home"); ?>"><img class="encabezado__logo--imagen" src="<?php bloginfo("template_url"); ?>/img/logotipo.png" alt="LOGOTIPO"></a>
-		<?php 
-			wp_nav_menu(
-				array(
-					'theme_location' => 'menu-header',
-					'container' => 'nav',
-					'container_class' => 'menu-movil centrado-flex',
-					'menu_class' => 'nav__list',
-					'link_before' => '<span class="icon-code"> </span>'
-					)
-			 );	
-		 ?>
+		<div class="menu-movil">
+			<a href="<?php bloginfo("home"); ?>"><img class="encabezado__logo--imagen" src="<?php bloginfo("template_url"); ?>/img/logotipo.png" alt="LOGOTIPO"></a>
+			<?php 
+				wp_nav_menu(
+					array(
+						'theme_location' => 'menu-header',
+						'container' => 'nav',
+						'container_class' => 'centrado-flex',
+						'menu_class' => 'nav__list',
+						'link_before' => '<span class="icon-code"> </span>'
+						)
+				 );	
+			 ?>
+		</div>
 <!-- 		<nav id="menu-movil" class="menu-movil centrado-flex">
 			<a href="<?php bloginfo("home"); ?>"><img class="encabezado__logo--imagen" src="<?php bloginfo("template_url"); ?>/img/logotipo.png" alt="LOGOTIPO"></a>
 			<ul>
