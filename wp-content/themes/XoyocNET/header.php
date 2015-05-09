@@ -17,7 +17,7 @@
 			<a href="#" class="boton__barra"><span class="icon-three-bars"></span>Menu</a>
 		</div>
 		<div class="menu-movil centrado-flex">
-			<a href="<?php bloginfo("home"); ?>"><img class="encabezado__logo--imagen" src="<?php bloginfo("template_url"); ?>/img/logotipo.png" alt="LOGOTIPO"></a>
+			<a href="<?php bloginfo("home"); ?>"><img class="brillo encabezado__logo--imagen" src="<?php bloginfo("template_url"); ?>/img/logotipo.png" alt="LOGOTIPO"><span></span></a>
 			<?php 
 				wp_nav_menu(
 					array(

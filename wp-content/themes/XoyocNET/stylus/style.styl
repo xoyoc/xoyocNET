@@ -26,6 +26,31 @@ azulmarino=#240BB3
 		transform scale(1.1)
 	20%, 60%
 		transform scale(0.8)
+.brillo
+    position relative
+    display block
+    font-size 70px
+    height 70px
+    width 200px
+    text-decoration none
+    color #333
+    overflow hidden
+.brillo span
+    position relative
+    display block
+    background url(brillo.png) no-repeat
+    background-position -100px 0px
+    margin-top -75px
+    height 70px
+    width 200px
+
+.brillo:hover span
+    background-position 300px 0px
+    -webkit-transition-property all
+    -webkit-transition-duration 1s
+    transition-property all
+    transition-duration 1s
+
 
 .centrado-flex
 	display flex
