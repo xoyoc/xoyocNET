@@ -9,6 +9,24 @@ verdepalido=#5F9442
 azulclaro=#C1DFFD
 azulmarino=#240BB3
 
+@keyframes aparecion
+	0%
+		opacity 0
+	100%
+		opacity 1
+@keyframes apizq
+	0%
+		opacity 0
+		left -100%
+	100%
+		opacity 1
+		left 0
+@keyframes dobleclick
+	40%
+		transform scale(1.1)
+	20%, 60%
+		transform scale(0.8)
+
 .centrado-flex
 	display flex
 	justify-content space-around
@@ -22,9 +40,9 @@ azulmarino=#240BB3
 	color red 
 	text-align center
 body
+	animation 1s aparecion linear
 	background url(../img/fondo.jpg) fixed
 	font-family 'Cabin Condensed', sans-serif
-	//font-size 16px
 	padding 2em
 ul
 	margin-bottom 0
@@ -80,6 +98,7 @@ header nav ul li a
 			background-color azulmarino
 			color white
 			&:hover
+				animation 1s dobleclick 1
 				background-color verdepalido
 				color black
 	.pie-pagina__formulario--campo-texto
