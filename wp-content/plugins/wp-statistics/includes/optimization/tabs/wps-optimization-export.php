@@ -1,6 +1,7 @@
 <div class="wrap">
 	
-	<form method="post" action="<?php echo plugins_url('../export.php', __FILE__); ?>">
+	<form method="post">
+	<input type="hidden" name="wps_export" value="true">
 	<table class="form-table">
 		<tbody>
 			<tr valign="top">
@@ -20,6 +21,7 @@
 						<option value="visitor"><?php echo $wpdb->prefix . 'statistics_visitor'; ?></option>
 						<option value="exclusions"><?php echo $wpdb->prefix . 'statistics_exclusions'; ?></option>
 						<option value="pages"><?php echo $wpdb->prefix . 'statistics_pages'; ?></option>
+						<option value="search"><?php echo $wpdb->prefix . 'statistics_search'; ?></option>
 					</select>
 					<p class="description"><?php _e('Select the table for the output file.', 'wp_statistics'); ?></p>
 				</td>
@@ -33,7 +35,6 @@
 				<td>
 					<select id="export-file-type" name="export-file-type">
 						<option value="0"><?php _e('Please select', 'wp_statistics'); ?></option>
-						<option value="excel">Excel</option>
 						<option value="xml">XML</option>
 						<option value="csv">CSV</option>
 						<option value="tsv">TSV</option>

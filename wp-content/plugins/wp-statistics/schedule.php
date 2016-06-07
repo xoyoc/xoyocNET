@@ -64,6 +64,18 @@
 		wp_unschedule_event(wp_next_scheduled('wp_statistics_browscap_hook'), 'wp_statistics_browscap_hook'); 
 	}
 
+	// Add the referrerspam update schedule if it doesn't exist and it should be.
+	if( !wp_next_scheduled('wp_statistics_referrerspam_hook') && $WP_Statistics->get_option('schedule_referrerspam') ) {
+	
+		wp_schedule_event(time(), 'weekly', 'wp_statistics_referrerspam_hook'); 
+	}
+
+	// Remove the referrerspam update schedule if it does exist and it should shouldn't.
+	if( wp_next_scheduled('wp_statistics_referrerspam_hook') && !$WP_Statistics->get_option('schedule_referrerspam') ) {
+	
+		wp_unschedule_event(wp_next_scheduled('wp_statistics_referrerspam_hook'), 'wp_statistics_referrerspam_hook'); 
+	}
+
 	// Add the database maintenance schedule if it doesn't exist and it should be.
 	if( !wp_next_scheduled('wp_statistics_dbmaint_hook') && $WP_Statistics->get_option('schedule_dbmaint') ) {
 	
@@ -74,6 +86,18 @@
 	if( wp_next_scheduled('wp_statistics_dbmaint_hook') && (!$WP_Statistics->get_option('schedule_dbmaint') ) ) {
 	
 		wp_unschedule_event(wp_next_scheduled('wp_statistics_dbmaint_hook'), 'wp_statistics_dbmaint_hook'); 
+	}
+
+	// Add the visitor database maintenance schedule if it doesn't exist and it should be.
+	if( !wp_next_scheduled('wp_statistics_dbmaint_visitor_hook') && $WP_Statistics->get_option('schedule_dbmaint_visitor') ) {
+	
+		wp_schedule_event(time(), 'daily', 'wp_statistics_dbmaint_visitor_hook'); 
+	}
+
+	// Remove the visitor database maintenance schedule if it does exist and it shouldn't.
+	if( wp_next_scheduled('wp_statistics_dbmaint_visitor_hook') && (!$WP_Statistics->get_option('schedule_dbmaint_visitor') ) ) {
+	
+		wp_unschedule_event(wp_next_scheduled('wp_statistics_dbmaint_visitor_hook'), 'wp_statistics_dbmaint_visitor_hook'); 
 	}
 
 	// Remove the add visit row schedule if it does exist and it shouldn't.
@@ -135,6 +159,16 @@
 	}
 	add_action('wp_statistics_browscap_hook', 'wp_statistics_browscap_event');
 
+	// This function updates the browscap database.
+	function wp_statistics_referrerspam_event() {
+	
+		GLOBAL $WP_Statistics;
+	
+		// Check for a new referrerspam once a week
+		$WP_Statistics->update_option('update_referrerspam',TRUE);
+	}
+	add_action('wp_statistics_referrerspam_hook', 'wp_statistics_referrerspam_event');
+
 	// This function will purge old records on a schedule based on age.
 	function wp_statistics_dbmaint_event() {
 
@@ -147,6 +181,19 @@
 		wp_statistics_purge_data( $purge_days );
 	}
 	add_action('wp_statistics_dbmaint_hook', 'wp_statistics_dbmaint_event');
+
+	// This function will purge visitors with more than a defined number of hits in a day.
+	function wp_statistics_dbmaint_visitor_event() {
+
+		global $wpdb, $WP_Statistics;
+		
+		require_once( plugin_dir_path( __FILE__ ) . '/includes/functions/purge-hits.php' );
+
+		$purge_hits = intval( $WP_Statistics->get_option('schedule_dbmaint_visitor_hits', FALSE) );
+		
+		wp_statistics_purge_visitor_hits( $purge_hits );
+	}
+	add_action('wp_statistics_dbmaint_visitor_hook', 'wp_statistics_dbmaint_visitor_event');
 
 	// This function sends the statistics report to the selected users.
 	function wp_statistics_send_report() {

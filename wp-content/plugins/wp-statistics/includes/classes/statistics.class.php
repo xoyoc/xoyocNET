@@ -10,7 +10,7 @@
 		// Setup our protected, private and public variables.		
 		protected $db;
 		protected $tb_prefix;
-		protected $ip;
+		protected $ip = false;
 		protected $ip_hash = false;
 		protected $agent;
 		
@@ -20,6 +20,7 @@
 		private $is_feed = false;
 		private $tz_offset = 0;
 		private $country_codes = false;
+		private $referrer = false;
 		
 		public $coefficient = 1;
 		public $plugin_dir = '';
@@ -27,6 +28,7 @@
 		public $user_id = 0;
 		public $options = array();
 		public $user_options = array();
+		public $menu_slugs = array();
 
 		// Construction function.
 		public function __construct() {
@@ -35,6 +37,8 @@
 			
 			if( get_option('timezone_string') ) {
 				$this->tz_offset = timezone_offset_get( timezone_open( get_option('timezone_string') ), new DateTime() );
+			} else if( get_option('gmt_offset') ) {
+				$this->tz_offset = get_option('gmt_offset') * 60 * 60;
 			}
 			
 			$this->db = $wpdb;
@@ -241,6 +245,9 @@
 		// This function returns the current IP address of the remote client.
 		public function get_IP() {
 		
+			// Check to see if we've already retrieved the IP address and if so return the last result.
+			if( $this->ip !== FALSE ) { return $this->ip; }
+		
 			// By default we use the remote address the server has.
 			$temp_ip = $_SERVER['REMOTE_ADDR'];
 		
@@ -273,6 +280,9 @@
 				// If the headers are invalid, use the server variable which should be good always.
 				$temp_ip = $_SERVER['REMOTE_ADDR'];
 			}
+
+			// If the ip address is blank, use 127.0.0.1 (aka localhost).
+			if( $temp_ip == '' ) { $temp_ip = '127.0.0.1'; }
 			
 			$this->ip = $temp_ip;
 			
@@ -307,18 +317,40 @@
 		}
 		
 		// This function will return the referrer link for the current user.
-		public function get_Referred($default_referr = false) {
-		
-			$referr = '';
+		public function get_Referred($default_referrer = false) {
 			
-			if( isset($_SERVER['HTTP_REFERER']) ) { $referr = $_SERVER['HTTP_REFERER']; }
-			if( $default_referr ) { $referr = $default_referr; }
+			if( $this->referrer !== false ) { return $this->referrer; }
 			
-			$referr = esc_sql(strip_tags($referr) );
+			$this->referrer = '';
 			
-			if( !$referr ) { $referr = get_bloginfo('url'); }
+			if( isset($_SERVER['HTTP_REFERER']) ) { $this->referrer = $_SERVER['HTTP_REFERER']; }
+			if( $default_referrer ) { $this->referrer = $default_referrer; }
 			
-			return $referr;
+			$this->referrer = esc_sql(strip_tags($this->referrer) );
+			
+			if( !$this->referrer ) { $this->referrer = get_bloginfo('url'); }
+			
+			if( $this->get_option( 'addsearchwords', false ) ) {
+				// Check to see if this is a search engine referrer
+				$SEInfo = $this->Search_Engine_Info( $this->referrer );
+				
+				if( is_array( $SEInfo ) ) {
+					// If we're a known SE, check the query string
+					if( $SEInfo['tag'] != '' ) {
+						$result = $this->Search_Engine_QueryString( $this->referrer );
+						
+						// If there were no search words, let's add the page title
+						if( $result == '' || $result == 'No search query found!' ) {
+							$result = wp_title('', false);
+							if( $result != '' ) {
+								$this->referrer = esc_url( add_query_arg( $SEInfo['querykey'], urlencode( '~"' . $result . '"' ), $this->referrer ) );
+							}
+						}
+					}
+				}
+			}
+			
+			return $this->referrer;
 		}
 		
 		// This function returns a date string in the desired format with a passed in timestamp.
@@ -364,6 +396,14 @@
 			} else {
 				return date_i18n($format, time() + $this->tz_offset);
 			}
+		}
+		
+		public function strtotimetz( $timestring ) {
+			return strtotime( $timestring ) + $this->tz_offset;
+		}
+		
+		public function timetz() {
+			return time() + $this->tz_offset;
 		}
 
 		// This function checks to see if a search engine exists in the current list of search engines.
@@ -411,12 +451,32 @@
 			return array('name' => 'Unknown', 'tag' => '', 'sqlpattern' => '', 'regexpattern' => '', 'querykey' => 'q', 'image' => 'unknown.png' );
 		}
 		
+		// This function returns an array of information about a given search engine based on the url passed in.
+		// It is used in several places to get the SE icon or the sql query to select an individual SE from the database.
+		public function Search_Engine_Info_By_Engine($engine = false) {
+				
+			// If there is no URL and no referrer, always return false.
+			if($engine == false) {
+				return false;
+			}
+			
+			// Get the list of search engines we currently support.
+			$search_engines = wp_statistics_searchengine_list();
+
+			if( array_key_exists( $engine, $search_engines ) ) {
+				return $search_engines[$engine];
+			}
+			
+			// If no SE matched, return some defaults.
+			return array('name' => 'Unknown', 'tag' => '', 'sqlpattern' => '', 'regexpattern' => '', 'querykey' => 'q', 'image' => 'unknown.png' );
+		}
+		
 		// This function will parse a URL from a referrer and return the search query words used.
 		public function Search_Engine_QueryString($url = false) {
 		
 			// If no URL was passed in, get the current referrer for the session.
 			if(!$url) {
-				$url = isset($_SERVER['HTTP_REFERER']) ? $this->get_Referred() : false;
+				$url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : false;
 			}
 			
 			// If there is no URL and no referrer, always return false.
@@ -450,7 +510,7 @@
 						$words = '';
 					}
 				
-					// If no words were found, return a pleasent default.
+					// If no words were found, return a pleasant default.
 					if( $words == '' ) { $words = 'No search query found!'; }
 					return $words;
 					}

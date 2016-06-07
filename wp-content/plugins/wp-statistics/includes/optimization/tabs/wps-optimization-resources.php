@@ -30,17 +30,6 @@
 
 			<tr valign="top">
 				<th scope="row">
-					<?php _e('Last Overview page memory usage', 'wp_statistics'); ?>:
-				</th>
-				
-				<td>
-					<strong><?php echo number_format_i18n($WP_Statistics->get_option('last_overview_memory')); ?></strong> <?php _e('Byte', 'wp_statistics'); ?>
-					<p class="description"><?php _e('Memory usage in the overview page', 'wp_statistics'); ?></p>
-				</td>
-			</tr>
-			
-			<tr valign="top">
-				<th scope="row">
 					<?php _e('PHP Memory Limit', 'wp_statistics'); ?>:
 				</th>
 				
@@ -117,6 +106,17 @@
 			</tr>
 
 			<tr valign="top">
+				<th scope="row">
+					<?php echo sprintf(__('Number of rows in the %s table', 'wp_statistics'), '<code>' . $wpdb->prefix . 'statistics_' . 'search' . '</code>'); ?>:
+				</th>
+				
+				<td>
+					<strong><?php echo number_format_i18n($result['search']); ?></strong> <?php _e('Row', 'wp_statistics'); ?>
+					<p class="description"><?php _e('Number of rows', 'wp_statistics'); ?></p>
+				</td>
+			</tr>
+
+			<tr valign="top">
 				<th scope="row" colspan="2"><h3><?php _e('Version Info', 'wp_statistics'); ?></h3></th>
 			</tr>
 			
@@ -177,12 +177,12 @@
 
 			<tr valign="top">
 				<th scope="row">
-					<?php _e('BC Math', 'wp_statistics'); ?>:
+					<?php _e('Zlib gzopen()', 'wp_statistics'); ?>:
 				</th>
 				
 				<td>
-					<strong><?php if( function_exists('bcadd') ) { _e('Installed','wp_statistics'); } else { _e('Not installed', 'wp_statistics'); }?></strong>
-					<p class="description"><?php _e('If the PHP BC Math Extension is installed.  BC Math is no longer required for the GeoIP code and is listed here only for historical reasons.', 'wp_statistics'); ?></p>
+					<strong><?php if( function_exists('gzopen') ) { _e('Installed','wp_statistics'); } else { _e('Not installed', 'wp_statistics'); }?></strong>
+					<p class="description"><?php _e('If the gzopen() function is installed.  gzopen() is required for the GeoIP database to be downloaded successfully.', 'wp_statistics'); ?></p>
 				</td>
 			</tr>
 
@@ -268,7 +268,7 @@
 				</th>
 				
 				<td>
-					<strong><?php echo $_SERVER['HTTP_USER_AGENT']; ?></strong>
+					<strong><?php echo htmlentities( $_SERVER['HTTP_USER_AGENT'], ENT_QUOTES ); ?></strong>
 					<p class="description"><?php _e('The client user agent string.', 'wp_statistics'); ?></p>
 				</td>
 			</tr>

@@ -16,7 +16,7 @@
 
 		list( $daysToDisplay, $rangestart_utime, $rangeend_utime ) = wp_statistics_date_range_calculator( $daysToDisplay, $rangestart, $rangeend );
 	
-		wp_statistics_date_range_selector( 'wps_hits_menu', $daysToDisplay );
+		wp_statistics_date_range_selector( WP_STATISTICS_HITS_PAGE, $daysToDisplay );
 	?>
 
 	<div class="postbox-container" style="width: 100%; float: left; margin-right:20px">
@@ -30,24 +30,30 @@
 						var visit_chart;
 						jQuery(document).ready(function() {
 <?php								
+								$visit_total = 0;
+								$visitor_total = 0;
+								$daysInThePast = ( time() - $rangeend_utime ) / 86400;
+								
 								echo "var visit_data_line = [";
 								
-								for( $i=$daysToDisplay; $i>=0; $i--) {
-									$stat = wp_statistics_visit('-'.$i, true);
+								for( $i = $daysToDisplay; $i >= 0; $i-- ) {
+									$working_date = $WP_Statistics->Real_Current_Date( 'Y-m-d', '-' . $i, $rangeend_utime );
+									$stat = wp_statistics_visit( '-' . (int)( $i + $daysInThePast ), true );
+									$visit_total += $stat;
 									
-									echo "['" . $WP_Statistics->Real_Current_Date('Y-m-d', '-'.$i, $rangeend_utime) . "'," . $stat . "], ";
-									
+									echo "['" . $working_date . "'," . $stat . "], ";
 								}
 
 								echo "];\n";
 
 								echo "var visitor_data_line = [";
 								
-								for( $i=$daysToDisplay; $i>=0; $i--) {
-									$stat = wp_statistics_visitor('-'.$i, true);
+								for( $i = $daysToDisplay; $i >= 0; $i-- ) {
+									$working_date = $WP_Statistics->Real_Current_Date( 'Y-m-d', '-' . $i, $rangeend_utime );
+									$stat = wp_statistics_visitor( '-' . (int)( $i + $daysInThePast ), true );
+									$visitor_total += $stat;
 									
-									echo "['" . $WP_Statistics->Real_Current_Date('Y-m-d', '-'.$i, $rangeend_utime) . "'," . $stat . "], ";
-									
+									echo "['" . $working_date . "'," . $stat . "], ";
 								}
 
 								echo "];\n";
@@ -149,4 +155,39 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="postbox-container" style="width: 100%; float: left; margin-right:20px">
+		<div class="metabox-holder">
+			<div class="meta-box-sortables">
+				<div class="postbox">
+					<div class="handlediv" title="<?php _e('Click to toggle', 'wp_statistics'); ?>"><br /></div>
+					<h3 class="hndle"><span><?php _e('Hits Statistics Summary', 'wp_statistics'); ?></span></h3>
+					<div class="inside">
+						<table width="auto" class="widefat table-stats" id="summary-stats">
+							<tbody>
+								<tr>
+									<th></th>
+									<th class="th-center"><?php _e('Visit', 'wp_statistics'); ?></th>
+									<th class="th-center"><?php _e('Visitor', 'wp_statistics'); ?></th>
+								</tr>
+								
+								<tr>
+									<th><?php _e('Chart Total', 'wp_statistics'); ?>:</th>
+									<th class="th-center"><span><?php echo number_format_i18n($visit_total); ?></span></th>
+									<th class="th-center"><span><?php echo number_format_i18n($visitor_total); ?></span></th>
+								</tr>
+								
+								<tr>
+									<th><?php _e('All Time Total', 'wp_statistics'); ?>:</th>
+									<th class="th-center"><span><?php echo number_format_i18n(wp_statistics_visit('total')); ?></span></th>
+									<th class="th-center"><span><?php echo number_format_i18n(wp_statistics_visitor('total',null,true)); ?></span></th>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
 </div>

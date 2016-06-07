@@ -1,5 +1,5 @@
 <?php
-	GLOBAL $wpdb;
+	GLOBAL $wpdb, $WP_Statistics;
 	$wp_prefix = $wpdb->prefix;
 
 	if( !is_super_admin() )
@@ -85,6 +85,11 @@
 
 				// We might have an old index left over from 7.1-7.3 so lets make sure to delete it.
 				$wpdb->query( "DROP INDEX `date_ip` ON {$wp_prefix}statistics_visitor" );
+
+				// Record in the options that we've done this update.
+				$dbupdates = $WP_Statistics->get_option('pending_db_updates');
+				$dbupdates['date_ip_agent'] = false;
+				$WP_Statistics->update_option('pending_db_updates', $dbupdates);
 			}
 		}
 	}
@@ -121,6 +126,11 @@
 				
 				// The table should be ready to be updated now with the new index, so let's do it.
 				$result = $wpdb->get_results( "ALTER TABLE " . $wp_prefix . 'statistics_visit' . " ADD UNIQUE `unique_date` ( `last_counter` )" );
+
+				// Record in the options that we've done this update.
+				$dbupdates = $WP_Statistics->get_option('pending_db_updates');
+				$dbupdates['unique_date'] = false;
+				$WP_Statistics->update_option('pending_db_updates', $dbupdates);
 			}
 		}
 	}
@@ -145,6 +155,48 @@
 
 	}
 	
+	if( array_key_exists( 'search', $_GET ) ) {
+
+		// Make sure we get all the search engines, even the ones the disabled ones.
+		$se_list = wp_statistics_searchengine_list();
+		$total = 0;
+		$limitsize = 10000;
+
+		foreach( $se_list as $key => $se ) {
+
+			$sql = wp_statistics_searchengine_query( $key );
+			$rowcount = $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->prefix}statistics_visitor` WHERE {$sql}" );
+			$offset = 0;
+		
+			while( $rowcount > 0 ) {
+		
+				$result = $wpdb->get_results( "SELECT * FROM `{$wpdb->prefix}statistics_visitor` WHERE {$sql} LIMIT {$offset}, {$limitsize}" );
+				
+				foreach( $result as $row ) {
+					$parts = parse_url( $row->referred );
+					
+					$data['last_counter'] = $row->last_counter;
+					$data['engine'] = $key;
+					$data['host'] = $parts['host'];
+					$data['words'] = $WP_Statistics->Search_Engine_QueryString( $row->referred );
+					$data['visitor'] = $row->ID;
+					
+					if( $data['words'] == 'No search query found!' ) { $data['words'] = ''; }
+
+					$wpdb->insert( $wpdb->prefix . 'statistics_search', $data );
+					$total++;
+				}
+				
+				$rowcount -= $limitsize;
+				$offset += $limitsize;
+			}
+		}
+
+		$WP_Statistics->update_option('search_converted', 1);
+		echo "<div class='updated settings-error'><p><strong>" . sprintf( __('Search table conversion complete, %d rows added.', 'wp_statistics'), $total ) . "</strong></p></div>";		
+
+	}
+
 $selected_tab = "";
 if( array_key_exists( 'tab', $_GET ) ) { $selected_tab = $_GET['tab']; }
 

@@ -1,17 +1,19 @@
 === WP Fastest Cache ===
 Contributors: emrevona
 Donate link: http://profiles.wordpress.org/emrevona/
-Tags: cache, caching, performance, wp-cache, optimize, minify, woocommerce, plugin, post, posts, google, ajax, comments, seo, adsense, gzip, google page speed, ylow
+Tags: cache, caching, performance, wp-cache, super cache, total cache, quick cache, wordpress cache, wp cache, wordpress caching, nginx cache, browser cache, page cache, advanced cache, disk cache, fastest cache, cache plugin, wordpress cache plugin, Mod_Rewrite Cache, wp super cache, minify css cache, minify js cache, minify css, minify js, combine css, combine css cache, combine js, combine js cache, minify html cache, nginx, optimize, minify, cdn, woocommerce, plugin, post, posts, google, ajax, comments, seo, gzip, gzip compression, gzip cache, google page speed, ylow, speed, pagespeed
 
 Requires at least: 3.3
-Tested up to: 4.2
-Stable tag: 4.3
+Tested up to: 4.5
+Stable tag: 4.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
+The simplest and fastest WP Cache system
+
 == Description ==
 
-<h4>Official Web Site</h4>
+<h4>Official Website</h4>
 
 You can find more information on our web site (<a href="http://www.wpfastestcache.com/">wpfastestcache.com</a>)
 
@@ -23,6 +25,9 @@ Cache system generates a static html file and saves. Other users reach to static
 <br><br>
 Setup of this plugin is so easy. You don't need to modify the .htacces file. It will be modified automatically.
 
+<h4>Multisite Support</h4>
+Wpfc does not support Wordpress Multisite yet.
+
 <h4>Features</h4>
 
 1. Mod_Rewrite which is the fastest method is used in this plugin
@@ -31,9 +36,12 @@ Setup of this plugin is so easy. You don't need to modify the .htacces file. It 
 4. Admin can delete minified css and js files from the options page
 5. Block cache for specific page or post with Short Code
 6. Cache Timeout - All cached files are deleted at the determinated time
-7. Enable/Disable cache option for mobile devices
-8. Enable/Disable cache option for logged-in users
-9. SSL support
+7. Cache Timeout for specific pages
+8. Enable/Disable cache option for mobile devices
+9. Enable/Disable cache option for logged-in users
+10. SSL support
+11. CDN support
+12. Preload Cache - Create the cache of all the site automatically
 
 <h4>Performance Optimization</h4>
 
@@ -47,14 +55,20 @@ Setup of this plugin is so easy. You don't need to modify the .htacces file. It 
 
 <h4>Supported languages: </h4>
 
+* 中文 (by suifengtec)
 * Deutsch
 * English
 * Español (by Diplo)
 * Français (by PascalJ)
 * Italiana (by Valerio)
 * 日本語 (by KUCKLU)
+* Nederlands (by Frans Pronk https://ifra.nl)
+* Polski (by roan24.pl)
 * Português
-* Русский
+* Română
+* Русский (by Maxim)
+* Suomi (by Arhi Paivarinta)
+* Svenska (by Linus Wileryd)
 * Türkçe
 
 == Installation ==
@@ -73,19 +87,112 @@ Setup of this plugin is so easy. You don't need to modify the .htacces file. It 
 5. Delete All File Page
 6. All cached files are deleted at the determinated time
 7. Block caching for post and pages (TinyMCE)
-8. Clean cached files via admin toolbar easly
+8. Clean cached files via admin toolbar easily
 9. Exclude page
+10. CDN
 
 == Changelog ==
+
+= 0.8.5.8 =
+* to remove hostname from exclude rule
+* to fix file cache problem
+* to change the mobile user-agents
+* to fix Wordfence Security report
+
+= 0.8.5.7 =
+* <strong>[FEATURE]</strong> Preload
+* to exclude the renamed page of woocommerce
+* to fix path which starts with ./ in css files
+* <strong>[FEATURE]</strong> Compatible with Visual Composer Post Grid
+* application/x-javascript has been added for leverage browser caching
+* to prevent removing newlines from .htaccess
+* <strong>[FEATURE]</strong> Compatible with WP-CLI
+* to add wp-touch mobile user-agent list
+* to exclude facebookexternalhit user-agent
+* <strong>[FEATURE]</strong> Compatible with Any Mobile Theme Switcher
+* <strong>[FEATURE]</strong> CDN for css files
+* to fix the huge size of tmpWpfc problem
+
+= 0.8.5.6 =
+* to combine css files by media attribute
+* to fix lots of disk usage issue
+* to fix design broken which occours after some time
+* to fix PHP Notice:  Undefined index: HTTP_ACCEPT
+* to fix WP-Polls issue if PHP v5.6
+* to remove ï»¿
+* <strong>[FEATURE]</strong> to add Polish language
+* <strong>[FEATURE]</strong> to add CDN77
+* to get the source of fonts.googleapis.com
+* new style of Exclude Page
+* to set cache timeout for specific pages
+* gzip for woff type
+* to fix "unknown error" of AWS cdn integration
+* <strong>[FEATURE]</strong> chinese language has been added
+* <strong>[FEATURE]</strong> Compatible with WP-PostRatings
+* to add WPFC_TOOLBAR_FOR_AUTHOR
+* to fix combine css issue if a file is empty after minify
+* to add woff2 for browser caching
+* to disable creating cache if get_option("home") is secure and current url is not secure
+* to fix switching theme from mobile to desktop on wptouch
+* to remove carriage return (^M)
+* <strong>[FEATURE]</strong> Finnish language has been added
+* <strong>[FEATURE]</strong> Nginx support
+* to use case-insensitive file system for browser caching
+* WAP-Browser has been added into mobile user agent list
+* to prevent 404 error for wpfc-minified after clearing minified files
+* <strong>[FEATURE]</strong> to add any cdn provider
+* <strong>[FEATURE]</strong> WPFC_DELETE_ALL_CACHE_AFTER_UPDATE has been added
+* to prevent from xss attacks (Brendon Boshell)
+* to clear the cache of homepage after update static page
+* to clear the cache of homepage after update sticky page
+* to clear the cache of homepage after update post which appears on homepage
+
+= 0.8.5.5 =
+* to add Amazon CloudFront CDN
+* to add KeyCDN
+* to update Russian Language
+* to fix PHP Notice: Undefined index: HTTP_USER_AGENT
+* to fix PHP Notice: Undefined index: name
+* to fix combine js issue with commented out js
+* to fix delete minify files issue
+* to add image/svg+xml for leverage browser cache
+* refactoring of minify and combine css features
+* to fix redirection to /wp-content/cache/all for ssl
+* to add text for toolbar icon
+
+= 0.8.5.4 =
+* to be compatible with Guideline
+
+= 0.8.5.3 =
+* to check zlib extension for downloading premium automatically
+* to update Portuguese and Turkish languages
+* to be compatible with sub-directory installation with renamed wp-content
+* refactoring of js-utilities.php
+* to fix delete comment issue
+
+= 0.8.5.2 =
+* to replace https:// and http:// to // after converting inline css to link
+* to replace https:// and http:// to // after converting inline js to link
+* to ignore the empty css files
+* to optimize exclude page feature
+* to fix mobile cache issue for ipad user if wp touch is used
+* to prevent caching js files whose type is text/template
+* to update Portuguese language
+
+= 0.8.5.1 =
+* <strong>[FEATURE]</strong> to add MaxCDN
+* to remove comments from inline js
+* to fix trim() issue
+* to be compatible with Leaflet Maps Marker
 
 = 0.8.5.0 =
 * to prevent combine js file which is added by WP Socializer
 * to make ruleForWpContent() pasive
 * refactoring of inlineToScript()
-* Romanian has been added
+* <strong>[FEATURE]</strong> Romanian has been added
 
 = 0.8.4.9 =
-* to be compatible with WP Mobile Edition
+* <strong>[FEATURE]</strong> to be compatible with WP Mobile Edition
 * to prevent from sql injection attacks (Kacper Szurek)
 * to prevent using Head Cleaner
 
@@ -153,7 +260,7 @@ Setup of this plugin is so easy. You don't need to modify the .htacces file. It 
 * to fix vulnerability (discoverd by 0pc0deFR aka Kevin FALCOZ)
 * to fix issue of moving chartset to the top
 * to prevent combine Google Fonts javascripts
-* [FEATURE] exclude page
+* <strong>[FEATURE]</strong>  exclude page
 
 = 0.8.3.4 =
 * to prevent inline to external if the style is used in the javascript
@@ -174,7 +281,7 @@ Setup of this plugin is so easy. You don't need to modify the .htacces file. It 
 = 0.8.3.1 =
 * index.html files have been added intead of .htaccess
 * to prevent comment out inline js rules twice
-* [FEATURE] to add delete button on the admin bar
+* <strong>[FEATURE]</strong>  to add delete button on the admin bar
 * to fix url() problem for data:image/svg+xml
 
 = 0.8.3.0 =
@@ -453,7 +560,7 @@ Setup of this plugin is so easy. You don't need to modify the .htacces file. It 
 You need to refresh a page twice. If a page is cached, at the bottom of the page there is a text like "&lt;!-- WP Fastest Cache file was created in 0.330816984177 seconds, on 08-01-14 9:01:35 --&gt;".
 
 = Does it work with Nginx? =
-No, it does not work with Nginx.
+Yes, it works with Nginx properly.
 
 = Does it work with IIS (Windows Server) ? =
 No, it does not work with IIS.
@@ -492,13 +599,16 @@ Yes, it is compatible with Bulletproof Security 100%.
 Yes, it is compatible with Wordfence Security 100%.
 
 = Is this plugin compatible with qTranslate? =
-Yes, it works if you use qTranslate with "Use Query Mode (?lang=en)".
+Yes, it is compatible with qTranslate 100%.
 
 = Is this plugin compatible with WPtouch Mobile Plugin? =
 Yes, it is compatible with WPtouch Mobile Plugin 100%.
 
+= Is this plugin compatible with Any Mobile Theme Switcher Plugin? =
+Yes, it is compatible with Any Mobile Theme Switcher Plugin 100%.
+
 = Is this plugin compatible with WP-PostRatings? =
-No, it is NOT compatible with WP-PostRatings.
+Yes, it is compatible with WP-PostRatings.
 
 = Is this plugin compatible with AdRotate? =
 No, it is NOT compatible with AdRotate.

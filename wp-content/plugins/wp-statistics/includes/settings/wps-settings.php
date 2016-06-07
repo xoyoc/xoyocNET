@@ -27,10 +27,10 @@ switch( $selected_tab )
 	case 'access':
 		if( $wps_admin ) { $current_tab = 3; } else { $current_tab = 0; }
 		break;
-	case 'geoip':
+	case 'exclusions':
 		if( $wps_admin ) { $current_tab = 4; } else { $current_tab = 0; }
 		break;
-	case 'browscap':
+	case 'externals':
 		if( $wps_admin ) { $current_tab = 5; } else { $current_tab = 0; }
 		break;
 	case 'maintenance':
@@ -69,10 +69,10 @@ switch( $selected_tab )
 					if( wps_admin == 1 ) { tab = 'access'; } else { tab = 'about'; }
 					break;
 				case 4:
-					if( wps_admin == 1 ) { tab = 'geoip'; } else { tab = 'about'; }
+					if( wps_admin == 1 ) { tab = 'exclusions'; } else { tab = 'about'; }
 					break;
 				case 5:
-					if( wps_admin == 1 ) { tab = 'browscap'; } else { tab = 'about'; }
+					if( wps_admin == 1 ) { tab = 'Externals'; } else { tab = 'about'; }
 					break;
 				case 6:
 					if( wps_admin == 1 ) { tab = 'maintenance'; } else { tab = 'about'; }
@@ -100,9 +100,9 @@ switch( $selected_tab )
 <?php if( $wps_admin ) { ?>				<li class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="#general-settings"><span><?php _e('General', 'wp_statistics'); ?></span></a></li><?php } ?>
 <?php if( $wps_admin ) { ?>				<li class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="#notifications-settings"><span><?php _e('Notifications', 'wp_statistics'); ?></span></a></li><?php } ?>
 				<li class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="#overview-display-settings"><span><?php _e('Dashboard/Overview', 'wp_statistics'); ?></span></a></li>
-<?php if( $wps_admin ) { ?>				<li class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="#access-settings"><span><?php _e('Access/Exclusions', 'wp_statistics'); ?></span></a></li><?php } ?>
-<?php if( $wps_admin ) { ?>				<li class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="#geoip-settings"><span><?php _e('GeoIP', 'wp_statistics'); ?></span></a></li><?php } ?>
-<?php if( $wps_admin ) { ?>				<li class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="#browscap-settings"><span><?php _e('browscap', 'wp_statistics'); ?></span></a></li><?php } ?>
+<?php if( $wps_admin ) { ?>				<li class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="#access-settings"><span><?php _e('Access Levels', 'wp_statistics'); ?></span></a></li><?php } ?>
+<?php if( $wps_admin ) { ?>				<li class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="#exclusions-settings"><span><?php _e('Exclusions', 'wp_statistics'); ?></span></a></li><?php } ?>
+<?php if( $wps_admin ) { ?>				<li class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="#externals-settings"><span><?php _e('Externals', 'wp_statistics'); ?></span></a></li><?php } ?>
 <?php if( $wps_admin ) { ?>				<li class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="#maintenance-settings"><span><?php _e('Maintenance', 'wp_statistics'); ?></span></a></li><?php } ?>
 <?php if( $wps_admin ) { ?>				<li class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="#removal-settings"><span><?php _e('Removal', 'wp_statistics'); ?></span></a></li><?php } ?>
 				<li class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="#about"><span><?php _e('About', 'wp_statistics'); ?></span></a></li>
@@ -124,12 +124,12 @@ switch( $selected_tab )
 			<?php if( $wps_admin ) { include( dirname( __FILE__ ) . '/tabs/wps-access-level.php' ); } ?>
 			</div>
 
-			<div id="geoip-settings">
-			<?php if( $wps_admin ) { include( dirname( __FILE__ ) . '/tabs/wps-geoip.php' ); } ?>
+			<div id="exclusions-settings">
+			<?php if( $wps_admin ) { include( dirname( __FILE__ ) . '/tabs/wps-exclusions.php' ); } ?>
 			</div>
 
-			<div id="browscap-settings">
-			<?php if( $wps_admin ) { include( dirname( __FILE__ ) . '/tabs/wps-browscap.php' ); } ?>
+			<div id="externals-settings">
+			<?php if( $wps_admin ) { include( dirname( __FILE__ ) . '/tabs/wps-externals.php' ); } ?>
 			</div>
 
 			<div id="maintenance-settings">

@@ -1,25 +1,4 @@
 <?php
-	function wp_statistics_generate_countries_postbox($ISOCountryCode, $search_engines) {
-	
-		global $WP_Statistics;
-
-		if( $WP_Statistics->get_option('geoip') ) { 
-?>
-				<div class="postbox">
-					<div class="handlediv" title="<?php _e('Click to toggle', 'wp_statistics'); ?>"><br /></div>
-					<h3 class="hndle">
-						<span><?php _e('Top 10 Countries', 'wp_statistics'); ?> <a href="?page=wps_countries_menu"><?php echo wp_statistics_icons('dashicons-visibility', 'visibility'); ?><?php _e('More', 'wp_statistics'); ?></a></span>
-					</h3>
-					<div class="inside">
-						<div class="inside">
-						<?php wp_statistics_generate_countries_postbox_content($ISOCountryCode); ?>
-						</div>
-					</div>
-				</div>
-<?php 
-		}
-	}
-
 	function wp_statistics_generate_countries_postbox_content($ISOCountryCode, $count = 10) {
 	
 		global $wpdb, $WP_Statistics;
@@ -40,7 +19,7 @@
 									
 									foreach( $result as $item )
 										{
-										$Countries[$item->location] = $wpdb->get_var("SELECT count(location) FROM `{$wpdb->prefix}statistics_visitor` WHERE location='" . $item->location . "'" );
+										$Countries[$item->location] = $wpdb->get_var( $wpdb->prepare( "SELECT count(location) FROM `{$wpdb->prefix}statistics_visitor` WHERE location=%s", $item->location ) );
 										}
 										
 									arsort($Countries);

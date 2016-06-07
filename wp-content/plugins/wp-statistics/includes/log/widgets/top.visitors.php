@@ -1,20 +1,4 @@
 <?php
-	function wp_statistics_generate_top_visitors_postbox($ISOCountryCode, $search_engines) {
-	
-		global $wpdb, $WP_Statistics;
-?>
-				<div class="postbox">
-					<div class="handlediv" title="<?php _e('Click to toggle', 'wp_statistics'); ?>"><br /></div>
-					<h3 class="hndle"><span><?php _e('Top 10 Visitors Today', 'wp_statistics'); ?> <a href="?page=wps_top_visitors_menu"> <?php echo wp_statistics_icons('dashicons-visibility', 'visibility'); ?><?php _e('More', 'wp_statistics'); ?></a></span></h3>
-					<div class="inside">
-<?php								
-					wp_statistics_generate_top_visitors_postbox_content($ISOCountryCode)
-?>						
-					</div>
-				</div>
-<?php		
-	}
-
 	function wp_statistics_generate_top_visitors_postbox_content($ISOCountryCode, $day='today', $count=10, $compact=false) {
 	
 		global $wpdb, $WP_Statistics;

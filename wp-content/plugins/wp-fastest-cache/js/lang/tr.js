@@ -64,7 +64,7 @@ window.wpfc.dictionary = {
 	"Mobile" : "Mobil",
 	"Image Optimization" : "Resim Optimizasyonu",
 	"Optimize Image Tool" : "Resim Optimizasyon Aracı",
-	"All JPEG" : "Tüm JPEG",
+	"All" : "Tüm",
 	"Pending" : "Bekleyenler",
 	"Errors" : "Hatalar",
 	"Optimized Images" : "Optimize Olanlar",
@@ -110,6 +110,15 @@ window.wpfc.dictionary = {
 	"/wp-content/plugins/ is not writable" : "/wp-content/plugins/ yazılabilir değil",
 	"Please read the tutorial" : "Lütfen dökümanı okuyunuz",
 	"You need to activate the premium plugin manually" : "Premium sürümünü manuel olarak aktifleştirmelisiniz",
-	"Continue" : "Devam Et"
-
+	"Continue" : "Devam Et",
+	"Minify Js" : "JS Küçült",
+	"You can decrease the size of js files" : "JS dosyalarının boyununu küçültebilirsiniz",
+	"Render Blocking Js" : "Oluşturma Engelleyici Js",
+	"Remove render-blocking JavaScript" : "Oluşturma engelleyici JavaScript'i kaldırın",
+	"Preload" : "Önyükleme",
+	"Create the cache of all the site automatically" : "Tüm sitenin cache'ini otomatik oluştur",
+	"CDN Settings" : "CDN Ayarları",
+	"Add New Rule" : "Yeni Kural Ekle",
+	"Timeout Rules" : "Zaman Aşımı Kuralları",
+	"Eliminate render-blocking JavaScript and CSS in above-the-fold content" : "Oluşturmayı önleyen JavaScript ve CSS kodlarını ekranın üst kısmındaki içerikten kaldırın"
 };

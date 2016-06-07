@@ -1,33 +1,9 @@
 <?php
-	function wp_statistics_generate_map_postbox($ISOCountryCode, $search_engines) {
-	
-		global $WP_Statistics;
-		
-		if($WP_Statistics->get_option('geoip') && !$WP_Statistics->get_option('disable_map') ) { ?>
-			<div class="postbox">
-				<div class="handlediv" title="<?php _e('Click to toggle', 'wp_statistics'); ?>"><br /></div>
-				<h3 class="hndle"><span><?php _e('Today Visitors Map', 'wp_statistics'); ?></span></h3>
-				<div class="inside">
-				<?php wp_statistics_generate_map_postbox_content($ISOCountryCode); ?>
-				</div>
-			</div>
-<?php 
-		}
-	}
-	
 	function wp_statistics_generate_map_postbox_content($ISOCountryCode) {
 	
 		global $wpdb, $WP_Statistics;
-		
-		// Some clients can't handle mixed http/https pages so check to see if the page we're on has http
-		// enabled, if so, use https instead just in case for the Google script.
-		$protocol = "http";
-	
-		if( array_key_exists( 'HTTPS', $_SERVER ) ) {
-			if( $_SERVER['HTTPS'] == 'on' ) { $protocol .= 's'; }
-		}
+
 ?>
-					<script src="<?php echo $protocol; ?>://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>
 					<div id="map_canvas">Google Map</div>
 					
 					<?php $result = $wpdb->get_row("SELECT * FROM `{$wpdb->prefix}statistics_visitor` WHERE last_counter = '{$WP_Statistics->Current_Date('Y-m-d')}'"); ?>

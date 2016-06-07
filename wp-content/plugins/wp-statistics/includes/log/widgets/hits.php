@@ -1,20 +1,4 @@
 <?php
-	function wp_statistics_generate_hits_postbox($ISOCountryCode, $search_engines) {
-	
-		global $wpdb, $WP_Statistics;
-?>
-				<div class="postbox">
-					<div class="handlediv" title="<?php _e('Click to toggle', 'wp_statistics'); ?>"><br /></div>
-					<h3 class="hndle"><span><?php _e('Hit Statistics', 'wp_statistics'); ?> <a href="?page=wps_hits_menu"> <?php echo wp_statistics_icons('dashicons-visibility', 'visibility'); ?><?php _e('More', 'wp_statistics'); ?></a></span></h3>
-					<div class="inside">
-<?php								
-					wp_statistics_generate_hits_postbox_content()
-?>						
-					</div>
-				</div>
-<?php		
-	}
-
 	function wp_statistics_generate_hits_postbox_content($size="300px", $days=20) {
 	
 		global $wpdb, $WP_Statistics;
@@ -22,31 +6,38 @@
 						<script type="text/javascript">
 						var visit_chart;
 						jQuery(document).ready(function() {
-<?php								
-								echo "var visit_data_line = [";
-								
-								for( $i=$days; $i>=0; $i--) {
-									$stat = wp_statistics_visit('-'.$i, true);
+<?php	
+								if( $WP_Statistics->get_option( 'visits' ) ) {
+									echo "var visit_data_line = [";
 									
-									echo "['" . $WP_Statistics->Current_Date('Y-m-d', '-'.$i) . "'," . $stat . "], ";
+									for( $i=$days; $i>=0; $i--) {
+										$stat = wp_statistics_visit('-'.$i, true);
+										
+										echo "['" . $WP_Statistics->Current_Date('Y-m-d', '-'.$i) . "'," . $stat . "], ";
+										
+									}
+
+									echo "];\n";
 									
+									$data_lines[] = 'visit_data_line';
 								}
 
-								echo "];\n";
+								if( $WP_Statistics->get_option( 'visitors' ) ) {
+									echo "var visitor_data_line = [";
+									
+									for( $i=$days; $i>=0; $i--) {
+										$stat = wp_statistics_visitor('-'.$i, true);
+										
+										echo "['" . $WP_Statistics->Current_Date('Y-m-d', '-'.$i) . "'," . $stat . "], ";
+										
+									}
 
-								echo "var visitor_data_line = [";
-								
-								for( $i=$days; $i>=0; $i--) {
-									$stat = wp_statistics_visitor('-'.$i, true);
-									
-									echo "['" . $WP_Statistics->Current_Date('Y-m-d', '-'.$i) . "'," . $stat . "], ";
-									
+									echo "];\n";
+
+									$data_lines[] = 'visitor_data_line';
 								}
-
-								echo "];\n";
-
 ?>
-							visit_chart = jQuery.jqplot('visits-stats', [visit_data_line, visitor_data_line], {
+							visit_chart = jQuery.jqplot('visits-stats', [<?php echo implode( ',', $data_lines)?>], {
 								title: {
 									text: '<b>' + <?php echo json_encode(__('Hits in the last', 'wp_statistics') . ' ' . $days . ' ' . __('days', 'wp_statistics')); ?> + '</b>',
 									fontSize: '12px',
@@ -83,7 +74,7 @@
 									show: true,
 									location: 's',
 									placement: 'outsideGrid',
-									labels: ['<?php echo json_encode(__('Visit', 'wp_statistics')); ?>', '<?php echo json_encode(__('Visitor', 'wp_statistics')); ?>'],
+									labels: [<?php echo implode( ',', array( json_encode( __( 'Visit', 'wp_statistics' ) ), json_encode( __('Visitor', 'wp_statistics') ) ) ); ?>],
 									renderer: jQuery.jqplot.EnhancedLegendRenderer,
 									rendererOptions:
 										{

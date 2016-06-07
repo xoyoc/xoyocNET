@@ -4,8 +4,6 @@
 	});
 </script>
 <?php
-	list( $total, $uris ) = wp_statistics_get_top_pages();
-
 	$daysToDisplay = 20; 
 	if( array_key_exists('hitdays',$_GET) ) { $daysToDisplay = intval($_GET['hitdays']); }
 
@@ -13,12 +11,15 @@
 	if( array_key_exists('rangeend', $_GET ) ) { $rangeend = $_GET['rangeend']; } else { $rangeend = ''; }
 
 	list( $daysToDisplay, $rangestart_utime, $rangeend_utime ) = wp_statistics_date_range_calculator( $daysToDisplay, $rangestart, $rangeend );
+
+	list( $total, $uris ) = wp_statistics_get_top_pages( $WP_Statistics->Real_Current_Date('Y-m-d', '-0', $rangestart_utime), $WP_Statistics->Real_Current_Date('Y-m-d', '-0', $rangeend_utime) );
+
 ?>
 <div class="wrap">
 	<?php screen_icon('options-general'); ?>
 	<h2><?php _e('Top Pages', 'wp_statistics'); ?></h2>
 
-	<?php wp_statistics_date_range_selector( 'wps_pages_menu', $daysToDisplay ); ?>
+	<?php wp_statistics_date_range_selector( WP_STATISTICS_PAGES_PAGE, $daysToDisplay ); ?>
 
 	<div class="postbox-container" id="last-log">
 		<div class="metabox-holder">
@@ -49,6 +50,12 @@
 
 									echo "];\n";
 									if( $count > 4 ) { break; }
+								}
+
+								if( $count < 6 ) {
+									for( $i = $count + 1 ; $i < 6; $i++ ) {
+										echo "var pages_data_line" . $i . " = [];\n";
+									}
 								}
 								
 								$tickInterval = $daysToDisplay / 20;
@@ -177,7 +184,7 @@
 											if( $uri[3] == '' ) { $uri[3] = '[' . htmlentities(__('No page title found', 'wp_statistics'), ENT_QUOTES) . ']'; }
 											
 											echo "<div class='log-page-title'>{$count} - {$uri[3]}</div>";
-											echo "<div class='right-div'>".__('Visits', 'wp_statistics').": <a href='?page=wps_pages_menu&page-uri={$uri[0]}'>" . number_format_i18n($uri[1]) . "</a></div>";
+											echo "<div class='right-div'>".__('Visits', 'wp_statistics').": <a href='?page=" . WP_STATISTICS_PAGES_PAGE . "&page-uri={$uri[0]}'>" . number_format_i18n($uri[1]) . "</a></div>";
 											echo "<div class='left-div'><a dir='ltr' href='" . htmlentities($site_url . $uri[0],ENT_QUOTES ) . "'>" . htmlentities(urldecode($uri[0]),ENT_QUOTES) . "</a></div>";
 											echo "</div>";
 										}

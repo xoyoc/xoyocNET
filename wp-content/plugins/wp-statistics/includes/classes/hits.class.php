@@ -40,7 +40,7 @@
 			}
 			
 			// Check to see if the user wants us to record why we're excluding hits.
-			if( $this->get_option('record_exclusions' ) == 1 ) {
+			if( $this->get_option('record_exclusions' ) ) {
 				$this->exclusion_record = TRUE;
 			}
 
@@ -61,7 +61,7 @@
 			// Order of exclusion checks is:
 			//		1 - Robots
 			// 		2 - IP/Subnets
-			//		3 - Self Referrals & login page
+			//		3 - Self Referrals, Referrer Spam & login page
 			//		4 - User roles
 			//		5 - Host name list
 			//
@@ -87,7 +87,13 @@
 				$bc->doAutoUpdate = false; 	// We don't want to auto update.
 				try {
 					$current_browser = $bc->getBrowser();
-					$crawler = $current_browser->Crawler;
+					// Make sure we got an object back and it has the Crawler property before accessing it.
+					if( is_object( $current_browser ) && property_exists( $current_browser, 'Crawler') ) {
+						$crawler = $current_browser->Crawler;
+					}
+					else {
+						$crawler = false; 
+					}
 				}
 				catch( Exception $e ) {
 					$crawler = false;
@@ -119,6 +125,14 @@
 						}
 					}
 				}
+				
+				// Finally check to see if we have corrupt header information.
+				if( !$this->exclusion_match && $this->get_option('corrupt_browser_info') ) {
+					if( $ua_string == '' || $this->ip == '' ) {
+						$this->exclusion_match = TRUE;
+						$this->exclusion_reason = "robot";
+					}
+				}
 			}
 			
 			// If we didn't match a robot, check ip subnets.
@@ -145,7 +159,7 @@
 					if( $ua_string == "WordPress/" . $wp_version . "; " . get_home_url(null,"/") ) { $this->exclusion_match = TRUE; $this->exclusion_reason = "self referral"; }
 					if( $ua_string == "WordPress/" . $wp_version . "; " . get_home_url() ) { $this->exclusion_match = TRUE; $this->exclusion_reason = "self referral"; }
 
-					if( $this->get_option('exclude_loginpage') == 1 ) {
+					if( $this->get_option('exclude_loginpage') ) {
 						$protocol = strpos(strtolower($_SERVER['SERVER_PROTOCOL']),'https')  === FALSE ? 'http' : 'https';
 						$host     = $_SERVER['HTTP_HOST'];
 						$script   = $_SERVER['SCRIPT_NAME'];
@@ -159,7 +173,7 @@
 						}
 					}
 
-					if( $this->get_option('exclude_adminpage') == 1 && !$this->exclusion_match ) {
+					if( $this->get_option('exclude_adminpage') && !$this->exclusion_match ) {
 						$protocol = strpos(strtolower($_SERVER['SERVER_PROTOCOL']),'https')  === FALSE ? 'http' : 'https';
 						$host     = $_SERVER['HTTP_HOST'];
 						$script   = $_SERVER['SCRIPT_NAME'];
@@ -175,12 +189,40 @@
 						}
 					}
 
-					if( $this->get_option('exclude_feeds') == 1 && !$this->exclusion_match ) {
+					if( $this->get_option('referrerspam') && !$this->exclusion_match ) {
+						$referrer = $this->get_Referred();
+
+						// Pull the referrer spam list from the database.
+						$referrerspamlist = explode( "\n", $this->get_option('referrerspamlist') );
+
+						// Check to see if we match any of the robots.
+						foreach($referrerspamlist as $item) {
+							$item = trim($item);
+							
+							// If the match case is less than 4 characters long, it might match too much so don't execute it.
+							if(strlen($item) > 3) { 
+								if(stripos($referrer, $item) !== FALSE) {
+									$this->exclusion_match = TRUE;
+									$this->exclusion_reason = "referrer_spam";
+									break;
+								}
+							}
+						}
+					}
+					
+					if( $this->get_option('exclude_feeds') && !$this->exclusion_match ) {
 						if( is_object( $WP_Statistics ) ) { 
 							if( $WP_Statistics->check_feed() ) { 
 								$this->exclusion_match = TRUE; 
 								$this->exclusion_reason = "feed";
 							}
+						}
+					}
+					
+					if( $this->get_option('exclude_404s') && !$this->exclusion_match ) {
+						if( is_404() ) { 
+							$this->exclusion_match = TRUE; 
+							$this->exclusion_reason = "404";
 						}
 					}
 					
@@ -307,7 +349,7 @@
 		
 		// This function records unique visitors to the site.
 		public function Visitors() {
-			global $wp_query;
+			global $wp_query, $WP_Statistics;
 
 			// Get the pages or posts ID if it exists.
 			if( is_object( $wp_query ) ) {
@@ -348,6 +390,36 @@
 					$sqlstring = $this->db->prepare( 'INSERT IGNORE INTO ' . $this->tb_prefix . 'statistics_visitor (last_counter, referred, agent, platform, version, ip, location, UAString, hits, honeypot) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, 1, %s )', $this->Current_date('Y-m-d'), $this->get_Referred(), $this->agent['browser'], $this->agent['platform'], $this->agent['version'], $this->ip_hash ? $this->ip_hash : $this->ip, $this->location, $ua, $honeypot );
 				
 					$this->db->query( $sqlstring );
+					
+					// Now parse the referrer and store the results in the search table if the database has been converted.
+					// Also make sure we actually inserted a row on the INSERT IGNORE above or we'll create duplicate entries.
+					if( $this->get_option('search_converted') && $this->db->insert_id ) {
+					
+						$search_engines = wp_statistics_searchengine_list();
+						$referred =  $this->get_Referred();
+						
+						// Parse the URL in to it's component parts.
+						$parts = parse_url($referred);
+
+						// Loop through the SE list until we find which search engine matches.
+						foreach( $search_engines as $key => $value ) {
+							$search_regex = wp_statistics_searchengine_regex($key);
+							
+							preg_match( '/' . $search_regex . '/', $parts['host'], $matches);
+							
+							if( isset($matches[1]) ) {
+								$data['last_counter'] = $this->Current_date('Y-m-d');
+								$data['engine'] = $key;
+								$data['words'] = $WP_Statistics->Search_Engine_QueryString( $referred );
+								$data['host'] = $parts['host'];
+								$data['visitor'] = $this->db->insert_id ;
+								
+								if( $data['words'] == 'No search query found!' ) { $data['words'] = ''; }
+
+								$this->db->insert( $this->db->prefix . 'statistics_search', $data );
+							}
+						}
+					}
 				}
 				else {
 					// Normally we've done all of our exclusion matching during the class creation, however for the robot threshold is calculated here to avoid another call the database.				
@@ -355,7 +427,7 @@
 						$this->exclusion_match = TRUE;
 						$this->exclusion_reason = "robot_threshold";
 					}
-					else if( $this->result->honeypot == 1 ) {
+					else if( $this->result->honeypot ) {
 						$this->exclusion_match = TRUE;
 						$this->exclusion_reason = "honeypot";
 					}
@@ -403,7 +475,12 @@
 					if( !$this->current_page_id && is_object( $wp_query ) ) {
 						$this->current_page_id = $wp_query->get_queried_object_id();
 					}
-	
+
+					// If we didn't find a page id, we don't have anything else to do.
+					if( ! $this->current_page_id ) {
+						return;
+					}
+					
 					// Get the current page URI.
 					$page_uri = wp_statistics_get_uri();
 					
@@ -416,7 +493,8 @@
 					$page_uri = substr( $page_uri, 0, 255);
 					
 					// If we have already been to this page today (a likely scenario), just update the count on the record.
-					$this->result = $this->db->query("UPDATE {$this->tb_prefix}statistics_pages SET `count` = `count` + 1 WHERE `date` = '{$this->Current_Date('Y-m-d')}' AND `uri` = '{$page_uri}'");
+					$sql = $this->db->prepare( "UPDATE {$this->tb_prefix}statistics_pages SET `count` = `count` + 1 WHERE `date` = '{$this->Current_Date('Y-m-d')}' AND `uri` = %s", $page_uri );
+					$this->result = $this->db->query($sql);
 
 					// If the update failed (aka the record doesn't exist), insert a new one.  Note this may drop a page hit if a race condition
 					// exists where two people load the same page a the roughly the same time.  In that case two inserts would be attempted but

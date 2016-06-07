@@ -25,7 +25,7 @@
 		
 			// Fetch the results from the database.
 			$result = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}statistics_visit WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', $time)}'");
-			
+
 			// If we have a result, return it, otherwise force a 0 to be returned instead of the logical FALSE that would otherwise be the case.
 			if( $result) {
 				return $result->visit;
@@ -146,7 +146,7 @@
 	}
 
 	// This function returns the statistics for a given page.
-	function wp_statistics_pages($time, $page_uri = '', $id = -1) {
+	function wp_statistics_pages($time, $page_uri = '', $id = -1, $rangestartdate = null, $rangeenddate = null ) {
 
 		// We need database and the global $WP_Statistics object access.
 		global $wpdb, $WP_Statistics;
@@ -157,6 +157,8 @@
 		// If no page URI has been passed in, get the current page URI.
 		if( $page_uri == '' ) { $page_uri = wp_statistics_get_uri(); }
 		
+		$page_uri_sql = esc_sql( $page_uri );
+		
 		// If a page/post ID has been passed, use it to select the rows, otherwise use the URI.
 		//  Note that a single page/post ID can have multiple URI's associated with it.
 		if( $id != -1 ) {
@@ -164,7 +166,7 @@
 			$history_key = 'page';
 			$history_id = $id;
 		} else {		
-			$page_sql = "`URI` = '{$page_uri}'";
+			$page_sql = "`URI` = '{$page_uri_sql}'";
 			$history_key = 'uri';
 			$history_id = $page_uri;
 		}
@@ -196,7 +198,10 @@
 				$sqlstatement = "SELECT SUM(count) FROM {$wpdb->prefix}statistics_pages WHERE {$page_sql}";
 				$history = $WP_Statistics->Get_Historical_Data( $history_key, $history_id );
 				break;
-				
+			case 'range':
+				$sqlstatement = "SELECT SUM(count) FROM {$wpdb->prefix}statistics_pages WHERE `date` BETWEEN '" . $WP_Statistics->Current_Date('Y-m-d', '-0', strtotime( $rangestartdate )) . "' AND '" . $WP_Statistics->Current_Date('Y-m-d', '-0', strtotime( $rangeenddate) ) . "' AND {$page_sql}";
+			
+				break;
 			default:
 				$sqlstatement = "SELECT SUM(count) FROM {$wpdb->prefix}statistics_pages WHERE `date` = '{$WP_Statistics->Current_Date('Y-m-d', $time)}' AND {$page_sql}";
 				break;
@@ -218,7 +223,7 @@
 		global $wpdb;
 		
 		// Create the SQL query to use.
-		$sqlstatement = "SELECT id FROM {$wpdb->prefix}statistics_pages WHERE `URI` = '{$uri}' AND id > 0";
+		$sqlstatement = $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}statistics_pages WHERE `URI` = %s AND id > 0", $uri );
 
 		// Execute the query.
 		$result = $wpdb->get_var( $sqlstatement );
@@ -235,11 +240,15 @@
 	}
 		
 	// This function returns a multi-dimensional array, with the total number of pages and an array or URI's sorted in order with their URI, count, id and title.
-	function wp_statistics_get_top_pages() {
+	function wp_statistics_get_top_pages( $rangestartdate = null, $rangeenddate = null ) {
 		global $wpdb;
 		
 		// Get every unique URI from the pages database.
-		$result = $wpdb->get_results( "SELECT DISTINCT uri FROM {$wpdb->prefix}statistics_pages", ARRAY_N );
+		if( $rangestartdate != null && $rangeenddate != null ) {
+			$result = $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT uri FROM {$wpdb->prefix}statistics_pages WHERE `date` BETWEEN %s AND %s", $rangestartdate, $rangeenddate ), ARRAY_N);
+		} else {
+			$result = $wpdb->get_results( "SELECT DISTINCT uri FROM {$wpdb->prefix}statistics_pages", ARRAY_N );
+		}
 
 		$total = 0;
 		$uris = array();
@@ -268,7 +277,11 @@
 			}
 
 			// Add the current post to the array.
-			$uris[] = array( $out[0], wp_statistics_pages( 'total', $out[0] ), $id, $title );
+			if( $rangestartdate != null && $rangeenddate != null ) {
+				$uris[] = array( $out[0], wp_statistics_pages( 'range', $out[0], -1, $rangestartdate, $rangeenddate ), $id, $title );
+			} else {
+				$uris[] = array( $out[0], wp_statistics_pages( 'total', $out[0] ), $id, $title );
+			}
 		}
 
 		// If we have more than one result, let's sort them using usort.
@@ -298,11 +311,15 @@
 	}
 	
 	// This function returns all unique user agents in the database.
-	function wp_statistics_ua_list() {
+	function wp_statistics_ua_list( $rangestartdate = null, $rangeenddate = null ) {
 	
 		global $wpdb;
 		
-		$result = $wpdb->get_results("SELECT DISTINCT agent FROM {$wpdb->prefix}statistics_visitor", ARRAY_N);
+		if( $rangestartdate != null && $rangeenddate != null ) {
+			$result = $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT agent FROM {$wpdb->prefix}statistics_visitor AND `last_counter` BETWEEN %s AND %s", $rangestartdate, $rangeenddate ), ARRAY_N);
+		} else {
+			$result = $wpdb->get_results( "SELECT DISTINCT agent FROM {$wpdb->prefix}statistics_visitor", ARRAY_N);
+		}
 
 		$Browers = array();
 		
@@ -315,21 +332,29 @@
 	}
 	
 	// This function returns the count of a given user agent in the database.
-	function wp_statistics_useragent($agent) {
+	function wp_statistics_useragent( $agent, $rangestartdate = null, $rangeenddate = null ) {
 	
 		global $wpdb;
 		
-		$result = $wpdb->get_var("SELECT COUNT(agent) FROM {$wpdb->prefix}statistics_visitor WHERE `agent` = '$agent'");
+		if( $rangestartdate != null && $rangeenddate != null ) {
+			$result = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(agent) FROM {$wpdb->prefix}statistics_visitor WHERE `agent` = %s AND `last_counter` BETWEEN %s AND %s", $agent, $rangestartdate, $rangeenddate ) );
+		} else {
+			$result = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(agent) FROM {$wpdb->prefix}statistics_visitor WHERE `agent` = %s", $agent ) );
+		}
 		
 		return $result;
 	}
 
 	// This function returns all unique platform types from the database.
-	function wp_statistics_platform_list() {
+	function wp_statistics_platform_list( $rangestartdate = null, $rangeenddate = null ) {
 	
 		global $wpdb;
 		
-		$result = $wpdb->get_results("SELECT DISTINCT platform FROM {$wpdb->prefix}statistics_visitor", ARRAY_N);
+		if( $rangestartdate != null && $rangeenddate != null ) {
+			$result = $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT platform FROM {$wpdb->prefix}statistics_visitor WHERE `last_counter` BETWEEN %s AND %s", $rangestartdate, $rangeenddate ), ARRAY_N);
+		} else {
+			$result = $wpdb->get_results("SELECT DISTINCT platform FROM {$wpdb->prefix}statistics_visitor", ARRAY_N);
+		}
 		
 		$Platforms = array();
 		
@@ -342,21 +367,29 @@
 	}
 
 	// This function returns the count of a given platform in the database.
-	function wp_statistics_platform($platform) {
+	function wp_statistics_platform( $platform, $rangestartdate = null, $rangeenddate = null ) {
 	
 		global $wpdb;
 		
-		$result = $wpdb->get_var("SELECT COUNT(platform) FROM {$wpdb->prefix}statistics_visitor WHERE `platform` = '$platform'");
+		if( $rangestartdate != null && $rangeenddate != null ) {
+			$result = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(platform) FROM {$wpdb->prefix}statistics_visitor WHERE `platform` = %s AND `last_counter` BETWEEN %s AND %s", $platform, $rangestartdate, $rangeenddate ) );
+		} else {
+			$result = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(platform) FROM {$wpdb->prefix}statistics_visitor WHERE `platform` = %s", $platform ) );
+		}
 		
 		return $result;
 	}
 	
 	// This function returns all unique versions for a given agent from the database.
-	function wp_statistics_agent_version_list($agent) {
+	function wp_statistics_agent_version_list( $agent, $rangestartdate = null, $rangeenddate = null ) {
 	
 		global $wpdb;
 		
-		$result = $wpdb->get_results("SELECT DISTINCT version FROM {$wpdb->prefix}statistics_visitor WHERE agent = '$agent'", ARRAY_N);
+		if( $rangestartdate != null && $rangeenddate != null ) {
+			$result = $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT version FROM {$wpdb->prefix}statistics_visitor WHERE agent = %s AND `last_counter` BETWEEN %s AND %s", $agent, $rangestartdate, $rangeenddate ), ARRAY_N );
+		} else {
+			$result = $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT version FROM {$wpdb->prefix}statistics_visitor WHERE agent = %s", $agent ), ARRAY_N );
+		}
 				
 		$Versions = array();
 				
@@ -369,11 +402,15 @@
 	}
 
 	// This function returns the statistcs for a given agent/version pair from the database.
-	function wp_statistics_agent_version($agent, $version) {
+	function wp_statistics_agent_version($agent, $version, $rangestartdate = null, $rangeenddate = null ) {
 	
 		global $wpdb;
 		
-		$result = $wpdb->get_var("SELECT COUNT(version) FROM {$wpdb->prefix}statistics_visitor WHERE agent = '$agent' AND version = '$version'");
+		if( $rangestartdate != null && $rangeenddate != null ) {
+			$result = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(version) FROM {$wpdb->prefix}statistics_visitor WHERE agent = %s AND version = %s AND `last_counter` BETWEEN %s AND %s", $agent, $version, $rangestartdate, $rangeenddate ) );
+		} else {
+			$result = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(version) FROM {$wpdb->prefix}statistics_visitor WHERE agent = %s AND version = %s", $agent, $version ) );
+		}
 		
 		return $result;
 	}
@@ -395,6 +432,7 @@
 		GLOBAL $WP_Statistics;
 		
 		$default = $engines = array (
+			'ask' => array( 'name' => 'Ask.com', 'translated' => __('Ask.com', 'wp_statistics'), 'tag' => 'ask', 'sqlpattern' => '%ask.com%', 'regexpattern' => 'ask\.com', 'querykey' => 'q', 'image' => 'ask.png' ),
 			'baidu' => array( 'name' => 'Baidu', 'translated' => __('Baidu', 'wp_statistics'), 'tag' => 'baidu', 'sqlpattern' => '%baidu.com%', 'regexpattern' => 'baidu\.com', 'querykey' => 'wd', 'image' => 'baidu.png' ),
 			'bing' => array( 'name' => 'Bing', 'translated' => __('Bing', 'wp_statistics'), 'tag' => 'bing', 'sqlpattern' => '%bing.com%', 'regexpattern' => 'bing\.com', 'querykey' => 'q', 'image' => 'bing.png' ), 
 			'clearch' => array( 'name' => 'clearch.org', 'translated' => __('clearch.org', 'wp_statistics'), 'tag' => 'clearch', 'sqlpattern' => '%clearch.org%', 'regexpattern' => 'clearch\.org', 'querykey' => 'q', 'image' => 'clearch.png' ),
@@ -418,39 +456,55 @@
 
 	// This function will return the SQL WHERE clause for getting the search words for a given search engine.
 	function wp_statistics_searchword_query ($search_engine = 'all') {
+		GLOBAL $WP_Statistics;
 	
 		// Get a complete list of search engines
 		$searchengine_list = wp_statistics_searchengine_list();
 		$search_query = '';
 		
-		// Are we getting results for all search engines or a specific one?
-		if( strtolower($search_engine) == 'all' ) {
-			// For all of them?  Ok, look through the search engine list and create a SQL query string to get them all from the database.
-			// NOTE:  This SQL query can be *VERY* long.
-			foreach( $searchengine_list as $se ) {
-				// The SQL pattern for a search engine may be an array if it has to handle multiple domains (like google.com and google.ca) or other factors.
-				if( is_array( $se['sqlpattern'] ) ) {
-					foreach( $se['sqlpattern'] as $subse ) {
-						$search_query .= "(`referred` LIKE '{$subse}{$se['querykey']}=%' AND `referred` NOT LIKE '{$subse}{$se['querykey']}=&%' AND `referred` NOT LIKE '{$subse}{$se['querykey']}=') OR ";
-					}
-				} else {
-					$search_query .= "(`referred` LIKE '{$se['sqlpattern']}{$se['querykey']}=%' AND `referred` NOT LIKE '{$se['sqlpattern']}{$se['querykey']}=&%' AND `referred` NOT LIKE '{$se['sqlpattern']}{$se['querykey']}=')  OR ";
+		if( $WP_Statistics->get_option('search_converted') ) {
+			// Are we getting results for all search engines or a specific one?
+			if( strtolower($search_engine) == 'all' ) {
+				// For all of them?  Ok, look through the search engine list and create a SQL query string to get them all from the database.
+				foreach( $searchengine_list as $key => $se ) {
+					$search_query .= "( `engine` = '{$key}' AND `words` <> '' ) OR ";
 				}
-			}
-			
-			// Trim off the last ' OR ' for the loop above.
-			$search_query = substr( $search_query, 0, strlen( $search_query ) - 4 );
-		} else {
-			// For just one?  Ok, the SQL pattern for a search engine may be an array if it has to handle multiple domains (like google.com and google.ca) or other factors.
-			if( is_array( $searchengine_list[$search_engine]['sqlpattern'] ) ) {
-				foreach( $searchengine_list[$search_engine]['sqlpattern'] as $se ) {
-					$search_query .= "(`referred` LIKE '{$se}{$searchengine_list[$search_engine]['querykey']}=%' AND `referred` NOT LIKE '{$se}{$searchengine_list[$search_engine]['querykey']}=&%' AND `referred` NOT LIKE '{$se}{$searchengine_list[$search_engine]['querykey']}=') OR ";
-				}
-
+				
 				// Trim off the last ' OR ' for the loop above.
 				$search_query = substr( $search_query, 0, strlen( $search_query ) - 4 );
 			} else {
-				$search_query .= "(`referred` LIKE '{$searchengine_list[$search_engine]['sqlpattern']}{$searchengine_list[$search_engine]['querykey']}=%' AND `referred` NOT LIKE '{$searchengine_list[$search_engine]['sqlpattern']}{$searchengine_list[$search_engine]['querykey']}=&%' AND `referred` NOT LIKE '{$searchengine_list[$search_engine]['sqlpattern']}{$searchengine_list[$search_engine]['querykey']}=')";
+				$search_query .= "`engine` = '{$search_engine}' AND `words` <> ''";
+			}
+		} else {
+			// Are we getting results for all search engines or a specific one?
+			if( strtolower($search_engine) == 'all' ) {
+				// For all of them?  Ok, look through the search engine list and create a SQL query string to get them all from the database.
+				// NOTE:  This SQL query can be *VERY* long.
+				foreach( $searchengine_list as $se ) {
+					// The SQL pattern for a search engine may be an array if it has to handle multiple domains (like google.com and google.ca) or other factors.
+					if( is_array( $se['sqlpattern'] ) ) {
+						foreach( $se['sqlpattern'] as $subse ) {
+							$search_query .= "(`referred` LIKE '{$subse}{$se['querykey']}=%' AND `referred` NOT LIKE '{$subse}{$se['querykey']}=&%' AND `referred` NOT LIKE '{$subse}{$se['querykey']}=') OR ";
+						}
+					} else {
+						$search_query .= "(`referred` LIKE '{$se['sqlpattern']}{$se['querykey']}=%' AND `referred` NOT LIKE '{$se['sqlpattern']}{$se['querykey']}=&%' AND `referred` NOT LIKE '{$se['sqlpattern']}{$se['querykey']}=')  OR ";
+					}
+				}
+				
+				// Trim off the last ' OR ' for the loop above.
+				$search_query = substr( $search_query, 0, strlen( $search_query ) - 4 );
+			} else {
+				// For just one?  Ok, the SQL pattern for a search engine may be an array if it has to handle multiple domains (like google.com and google.ca) or other factors.
+				if( is_array( $searchengine_list[$search_engine]['sqlpattern'] ) ) {
+					foreach( $searchengine_list[$search_engine]['sqlpattern'] as $se ) {
+						$search_query .= "(`referred` LIKE '{$se}{$searchengine_list[$search_engine]['querykey']}=%' AND `referred` NOT LIKE '{$se}{$searchengine_list[$search_engine]['querykey']}=&%' AND `referred` NOT LIKE '{$se}{$searchengine_list[$search_engine]['querykey']}=') OR ";
+					}
+
+					// Trim off the last ' OR ' for the loop above.
+					$search_query = substr( $search_query, 0, strlen( $search_query ) - 4 );
+				} else {
+					$search_query .= "(`referred` LIKE '{$searchengine_list[$search_engine]['sqlpattern']}{$searchengine_list[$search_engine]['querykey']}=%' AND `referred` NOT LIKE '{$searchengine_list[$search_engine]['sqlpattern']}{$searchengine_list[$search_engine]['querykey']}=&%' AND `referred` NOT LIKE '{$searchengine_list[$search_engine]['sqlpattern']}{$searchengine_list[$search_engine]['querykey']}=')";
+				}
 			}
 		}
 		
@@ -459,40 +513,56 @@
 
 	// This function will return the SQL WHERE clause for getting the search engine.
 	function wp_statistics_searchengine_query ($search_engine = 'all') {
-
+		GLOBAL $WP_Statistics;
+	
 		// Get a complete list of search engines
 		$searchengine_list = wp_statistics_searchengine_list();
 		$search_query = '';
-		
-		// Are we getting results for all search engines or a specific one?
-		if( strtolower($search_engine) == 'all' ) {
-			// For all of them?  Ok, look through the search engine list and create a SQL query string to get them all from the database.
-			// NOTE:  This SQL query can be long.
-			foreach( $searchengine_list as $se ) {
-				// The SQL pattern for a search engine may be an array if it has to handle multiple domains (like google.com and google.ca) or other factors.
-				if( is_array( $se['sqlpattern'] ) ) {
-					foreach( $se['sqlpattern'] as $subse ) {
-						$search_query .= "`referred` LIKE '{$subse}' OR ";
-					}
-				} else {
-					$search_query .= "`referred` LIKE '{$se['sqlpattern']}' OR ";
-				}
-			}
-			
-			// Trim off the last ' OR ' for the loop above.
-			$search_query = substr( $search_query, 0, strlen( $search_query ) - 4 );
-		} else {
-			// For just one?  Ok, the SQL pattern for a search engine may be an array if it has to handle multiple domains (like google.com and google.ca) or other factors.
-			if( is_array( $searchengine_list[$search_engine]['sqlpattern'] ) ) {
-				foreach( $searchengine_list[$search_engine]['sqlpattern'] as $se ) {
-					$search_query .= "`referred` LIKE '{$se}' OR ";
-				}
 
+		if( $WP_Statistics->get_option('search_converted') ) {
+			// Are we getting results for all search engines or a specific one?
+			if( strtolower($search_engine) == 'all' ) {
+				// For all of them?  Ok, look through the search engine list and create a SQL query string to get them all from the database.
+				foreach( $searchengine_list as $key => $se ) {
+					$search_query .= "`engine` = '{$key}' OR ";
+				}
+				
 				// Trim off the last ' OR ' for the loop above.
 				$search_query = substr( $search_query, 0, strlen( $search_query ) - 4 );
+			} else {
+				$search_query .= "`engine` = '{$search_engine}'";
 			}
-			else {
-				$search_query .= "`referred` LIKE '{$searchengine_list[$search_engine]['sqlpattern']}'";
+		} else {
+			// Are we getting results for all search engines or a specific one?
+			if( strtolower($search_engine) == 'all' ) {
+				// For all of them?  Ok, look through the search engine list and create a SQL query string to get them all from the database.
+				// NOTE:  This SQL query can be long.
+				foreach( $searchengine_list as $se ) {
+					// The SQL pattern for a search engine may be an array if it has to handle multiple domains (like google.com and google.ca) or other factors.
+					if( is_array( $se['sqlpattern'] ) ) {
+						foreach( $se['sqlpattern'] as $subse ) {
+							$search_query .= "`referred` LIKE '{$subse}' OR ";
+						}
+					} else {
+						$search_query .= "`referred` LIKE '{$se['sqlpattern']}' OR ";
+					}
+				}
+				
+				// Trim off the last ' OR ' for the loop above.
+				$search_query = substr( $search_query, 0, strlen( $search_query ) - 4 );
+			} else {
+				// For just one?  Ok, the SQL pattern for a search engine may be an array if it has to handle multiple domains (like google.com and google.ca) or other factors.
+				if( is_array( $searchengine_list[$search_engine]['sqlpattern'] ) ) {
+					foreach( $searchengine_list[$search_engine]['sqlpattern'] as $se ) {
+						$search_query .= "`referred` LIKE '{$se}' OR ";
+					}
+
+					// Trim off the last ' OR ' for the loop above.
+					$search_query = substr( $search_query, 0, strlen( $search_query ) - 4 );
+				}
+				else {
+					$search_query .= "`referred` LIKE '{$searchengine_list[$search_engine]['sqlpattern']}'";
+				}
 			}
 		}
 		
@@ -544,6 +614,15 @@
 	
 		global $wpdb, $WP_Statistics;
 
+		// Determine if we're using the old or new method of storing search engine info and build the appropriate table name.
+		$tablename = $wpdb->prefix . 'statistics_';
+		
+		if( $WP_Statistics->get_option('search_converted') ) {
+			$tablename .= 'search';
+		} else {
+			$tablename .= 'visitor';
+		}
+
 		// Get a complete list of search engines
 		$search_query = wp_statistics_searchengine_query($search_engine);
 
@@ -551,36 +630,36 @@
 		// They're pretty self explanatory.
 		switch($time) {
 			case 'today':
-				$result = $wpdb->query("SELECT * FROM `{$wpdb->prefix}statistics_visitor` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d')}' AND {$search_query}");
+				$result = $wpdb->query("SELECT * FROM `{$tablename}` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d')}' AND {$search_query}");
 				break;
 				
 			case 'yesterday':
-				$result = $wpdb->query("SELECT * FROM `{$wpdb->prefix}statistics_visitor` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', -1)}' AND {$search_query}");
+				$result = $wpdb->query("SELECT * FROM `{$tablename}` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', -1)}' AND {$search_query}");
 				
 				break;
 				
 			case 'week':
-				$result = $wpdb->query("SELECT * FROM `{$wpdb->prefix}statistics_visitor` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', -7)}' AND {$search_query}");
+				$result = $wpdb->query("SELECT * FROM `{$tablename}` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', -7)}' AND {$search_query}");
 				
 				break;
 				
 			case 'month':
-				$result = $wpdb->query("SELECT * FROM `{$wpdb->prefix}statistics_visitor` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', -30)}' AND {$search_query}");
+				$result = $wpdb->query("SELECT * FROM `{$tablename}` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', -30)}' AND {$search_query}");
 				
 				break;
 				
 			case 'year':
-				$result = $wpdb->query("SELECT * FROM `{$wpdb->prefix}statistics_visitor` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', -360)}' AND {$search_query}");
+				$result = $wpdb->query("SELECT * FROM `{$tablename}` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', -360)}' AND {$search_query}");
 				
 				break;
 				
 			case 'total':
-				$result = $wpdb->query("SELECT * FROM `{$wpdb->prefix}statistics_visitor` WHERE {$search_query}");
+				$result = $wpdb->query("SELECT * FROM `{$tablename}` WHERE {$search_query}");
 				
 				break;
 				
 			default:
-				$result = $wpdb->query("SELECT * FROM `{$wpdb->prefix}statistics_visitor` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', $time)}' AND {$search_query}");
+				$result = $wpdb->query("SELECT * FROM `{$tablename}` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', $time)}' AND {$search_query}");
 				
 				break;
 		}
@@ -593,6 +672,15 @@
 	
 		global $wpdb, $WP_Statistics;
 
+		// Determine if we're using the old or new method of storing search engine info and build the appropriate table name.
+		$tablename = $wpdb->prefix . 'statistics_';
+		
+		if( $WP_Statistics->get_option('search_converted') ) {
+			$tablename .= 'search';
+		} else {
+			$tablename .= 'visitor';
+		}
+
 		// Get a complete list of search engines
 		$search_query = wp_statistics_searchword_query($search_engine);
 
@@ -600,36 +688,36 @@
 		// They're pretty self explanatory.
 		switch($time) {
 			case 'today':
-				$result = $wpdb->query("SELECT * FROM `{$wpdb->prefix}statistics_visitor` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d')}' AND {$search_query}");
+				$result = $wpdb->query("SELECT * FROM `{$tablename}` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d')}' AND {$search_query}");
 				break;
 				
 			case 'yesterday':
-				$result = $wpdb->query("SELECT * FROM `{$wpdb->prefix}statistics_visitor` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', -1)}' AND {$search_query}");
+				$result = $wpdb->query("SELECT * FROM `{$tablename}` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', -1)}' AND {$search_query}");
 				
 				break;
 				
 			case 'week':
-				$result = $wpdb->query("SELECT * FROM `{$wpdb->prefix}statistics_visitor` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', -7)}' AND {$search_query}");
+				$result = $wpdb->query("SELECT * FROM `{$tablename}` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', -7)}' AND {$search_query}");
 				
 				break;
 				
 			case 'month':
-				$result = $wpdb->query("SELECT * FROM `{$wpdb->prefix}statistics_visitor` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', -30)}' AND {$search_query}");
+				$result = $wpdb->query("SELECT * FROM `{$tablename}` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', -30)}' AND {$search_query}");
 				
 				break;
 				
 			case 'year':
-				$result = $wpdb->query("SELECT * FROM `{$wpdb->prefix}statistics_visitor` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', -360)}' AND {$search_query}");
+				$result = $wpdb->query("SELECT * FROM `{$tablename}` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', -360)}' AND {$search_query}");
 				
 				break;
 				
 			case 'total':
-				$result = $wpdb->query("SELECT * FROM `{$wpdb->prefix}statistics_visitor` WHERE {$search_query}");
+				$result = $wpdb->query("SELECT * FROM `{$tablename}` WHERE {$search_query}");
 				
 				break;
 				
 			default:
-				$result = $wpdb->query("SELECT * FROM `{$wpdb->prefix}statistics_visitor` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', $time)}' AND {$search_query}");
+				$result = $wpdb->query("SELECT * FROM `{$tablename}` WHERE `last_counter` = '{$WP_Statistics->Current_Date('Y-m-d', $time)}' AND {$search_query}");
 				
 				break;
 		}
@@ -666,7 +754,7 @@
 	
 		global $wpdb;
 		
-		$countcomms = $wpdb->get_var("SELECT COUNT(*) FROM $wpdb->comments WHERE comment_approved = '1'");
+		$countcomms = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->comments} WHERE comment_approved = '1'");
 		
 		return $countcomms;
 	}
@@ -689,7 +777,7 @@
 	
 		global $wpdb, $WP_Statistics;
 		
-		$db_date = $wpdb->get_var("SELECT post_date FROM $wpdb->posts WHERE post_type='post' AND post_status='publish' ORDER BY ID DESC LIMIT 1");
+		$db_date = $wpdb->get_var("SELECT post_date FROM {$wpdb->posts} WHERE post_type='post' AND post_status='publish' ORDER BY post_date DESC LIMIT 1");
 		
 		$date_format = get_option('date_format');
 		
@@ -702,8 +790,8 @@
 	
 		global $wpdb;
 		
-		$get_first_post = $wpdb->get_var("SELECT post_date FROM $wpdb->posts WHERE post_status = 'publish' ORDER BY post_date LIMIT 1");
-		$get_total_post = $wpdb->get_var("SELECT COUNT(*) FROM $wpdb->posts WHERE post_status = 'publish' AND post_type = 'post'");
+		$get_first_post = $wpdb->get_var("SELECT post_date FROM {$wpdb->posts} WHERE post_status = 'publish' ORDER BY post_date LIMIT 1");
+		$get_total_post = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_status = 'publish' AND post_type = 'post'");
 		
 		$days_spend = intval((time() - strtotime($get_first_post) ) / 86400); // 86400 = 60 * 60 * 24 = number of seconds in a day
 		
@@ -723,8 +811,8 @@
 	
 		global $wpdb;
 		
-		$get_first_comment = $wpdb->get_var("SELECT comment_date FROM $wpdb->comments ORDER BY comment_date LIMIT 1");
-		$get_total_comment = $wpdb->get_var("SELECT COUNT(*) FROM $wpdb->comments WHERE comment_approved = '1'");
+		$get_first_comment = $wpdb->get_var("SELECT comment_date FROM {$wpdb->comments} ORDER BY comment_date LIMIT 1");
+		$get_total_comment = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->comments} WHERE comment_approved = '1'");
 
 		$days_spend = intval((time() - strtotime($get_first_comment) ) / 86400); // 86400 = 60 * 60 * 24 = number of seconds in a day
 		
@@ -744,8 +832,8 @@
 	
 		global $wpdb;
 		
-		$get_first_user = $wpdb->get_var("SELECT user_registered FROM $wpdb->users ORDER BY user_registered LIMIT 1");
-		$get_total_user = $wpdb->get_var("SELECT COUNT(*) FROM $wpdb->users");
+		$get_first_user = $wpdb->get_var("SELECT user_registered FROM {$wpdb->users} ORDER BY user_registered LIMIT 1");
+		$get_total_user = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->users}");
 
 		$days_spend = intval((time() - strtotime($get_first_user) ) / 86400); // 86400 = 60 * 60 * 24 = number of seconds in a day
 		
@@ -832,15 +920,17 @@
 	}
 	
 	// This function handle's the dashicons in the overview page.
-	function wp_statistics_icons($dashicons, $icon_name) {
+	function wp_statistics_icons($dashicons, $icon_name = null) {
 		
 		global $wp_version;
 		
+		if( null == $icon_name ) { $icon_name = $dashicons; }
+		
 		// Since versions of WordPress before 3.8 didn't have dashicons, don't use them in those versions.
 		if( version_compare( $wp_version, '3.8-RC', '>=' ) || version_compare( $wp_version, '3.8', '>=' ) ) {
-			return "<div class='dashicons {$dashicons}'></div>";
+			return '<span class="dashicons ' . $dashicons . '"></span>';
 		} else {
-			return "<img src='".plugins_url('wp-statistics/assets/images/')."{$icon_name}.png'/>";
+			return '<img src="' . plugins_url('wp-statistics/assets/images/') . $icon_name . '.png"/>';
 		}
 	}
 	
@@ -867,6 +957,7 @@
 		return $enabled;
 	}
 	
+	// This function creates the date range selector 'widget' used in the various statistics pages.
 	function wp_statistics_date_range_selector( $page, $current, $range = array(), $desc = array(), $extrafields = '' ) {
 		GLOBAL $WP_Statistics;
 		
@@ -885,13 +976,26 @@
 		
 		$rcount = count( $range );
 		
-		$rangestart = '';
-		$rangeend = '';
-		
 		$bold = true;
-		if( array_key_exists( 'rangestart', $_GET ) ) { $rangestart = $_GET['rangestart']; } 
-		if( array_key_exists( 'rangeend', $_GET ) ) { $rangeend = $_GET['rangeend']; }
 
+		// Check to see if there's a range in the URL, if so set it, otherwise use the default.
+		if( array_key_exists( 'rangestart', $_GET ) ) { $rangestart = $_GET['rangestart']; } else { $rangestart = $WP_Statistics->Current_Date('m/d/Y', '-' . $current); } 
+		if( array_key_exists( 'rangeend', $_GET ) ) { $rangeend = $_GET['rangeend']; } else { $rangeend = $WP_Statistics->Current_Date('m/d/Y'); }
+
+		// Now get the number of days in the range.
+		$rangestart_utime = $WP_Statistics->strtotimetz( $rangestart );
+		$rangeend_utime = $WP_Statistics->strtotimetz( $rangeend );
+		$daysToDisplay = (int)( ( $rangeend_utime - $rangestart_utime ) / 24 / 60 / 60 );
+		
+		// If the rangeend isn't today AND not one of the standard range values, then it's a custom selected value and we need to flag it as such.
+		if( $rangeend != $WP_Statistics->Current_Date('m/d/Y') && ! in_array( $current, $range ) ) {
+			$current = -1;
+		} else {
+			// If on the other hand we are a standard range, let's reset the custom range selector to match it.
+			$rangestart = $WP_Statistics->Current_Date('m/d/Y', '-' . $current);
+			$rangeend = $WP_Statistics->Current_Date('m/d/Y');
+		}
+		
 		echo '<form method="get"><ul class="subsubsub">' . "\r\n";
 		
 		for( $i = 0; $i < $rcount; $i ++ ) {
@@ -923,9 +1027,8 @@
 		}
 		else {
 			echo ' ' . __('Range', 'wp_statistics' ) . ': ';
-			$rangeend = $WP_Statistics->Real_Current_Date('m/d/Y');
-			$rangestart = $WP_Statistics->Real_Current_Date('m/d/Y','-'.$current);
 		}
+		
 		echo '<input type="text" size="10" name="rangestart" id="datestartpicker" value="' . $rangestart. '" placeholder="' . __('MM/DD/YYYY', 'wp_statistics') .'"> '.__('to', 'wp_statistics').' <input type="text" size="10" name="rangeend" id="dateendpicker" value="' . $rangeend . '" placeholder="' . __('MM/DD/YYYY', 'wp_statistics') .'"> <input type="submit" value="'.__('Go', 'wp_statistics').'" class="button-primary">' . "\r\n";
 		
 		echo '</ul><form>' . "\r\n";
@@ -933,26 +1036,60 @@
 		echo '<script>jQuery(function() { jQuery( "#datestartpicker" ).datepicker(); jQuery( "#dateendpicker" ).datepicker(); });</script>' . "\r\n";
 	}
 	
+	// This function is used to calculate the number of days and thier respective unix timestamps.
 	function wp_statistics_date_range_calculator( $days, $start, $end ) {
+		GLOBAL $WP_Statistics;
+		
 		$daysToDisplay = $days;
 		$rangestart = $start;
 		$rangeend = $end;
 
 		if( $daysToDisplay == -1 ) {
-			$rangestart_utime = strtotime( $rangestart );
-			$rangeend_utime = strtotime( $rangeend );
+			$rangestart_utime = $WP_Statistics->strtotimetz( $rangestart );
+			$rangeend_utime = $WP_Statistics->strtotimetz( $rangeend );
 			$daysToDisplay = (int)( ( $rangeend_utime - $rangestart_utime ) / 24 / 60 / 60 );
 			
 			if( $rangestart_utime == FALSE || $rangeend_utime == FALSE ) {
 				$daysToDisplay = 20;
-				$rangeend_utime = time();
+				$rangeend_utime = $WP_Statistics->timetz();
 				$rangestart_utime = $rangeend_utime - ( $daysToDisplay * 24 * 60 * 60 );
 			}
 		}
 		else {
-			$rangeend_utime = time();
+			$rangeend_utime = $WP_Statistics->timetz();
 			$rangestart_utime = $rangeend_utime - ( $daysToDisplay * 24 * 60 * 60 );
 		}
 		
 		return array( $daysToDisplay, $rangestart_utime, $rangeend_utime );
 	}
+	
+	// This function will empty a table based on the table name.
+	function wp_statitiscs_empty_table( $table_name = FALSE ) {
+		global $wpdb;
+		
+		if( $table_name ) {
+			$result = $wpdb->query('DELETE FROM ' . $table_name);
+			
+			if($result) {
+				return sprintf(__('%s table data deleted successfully.', 'wp_statistics'), '<code>' . $table_name . '</code>');
+			}
+		}
+
+		return sprintf(__('Error, %s not emptied!', 'wp_statistics'), $table_name ); 
+	}	
+
+	// This function creates a small JavaScript snipit that will load the contents of a overview or dashboard widget.
+	function wp_statistics_generate_widget_load_javascript( $widget, $container_id = null ) {
+		if( null == $container_id ) {
+			$container_id = str_replace( '.', '_', $widget . '_postbox' );
+		}
+?>
+<script type="text/javascript">
+	jQuery(document).ready(function() {
+		wp_statistics_get_widget_contents( '<?php echo $widget; ?>', '<?php echo $container_id; ?>' );
+	});
+</script>
+<?php
+	}
+	
+	

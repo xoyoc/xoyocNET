@@ -18,10 +18,10 @@
 
 	$total_stats = $WP_Statistics->get_option( 'chart_totals' );
 	
-	$excluded_reasons = array('Robot','Browscap','IP Match','Self Referral','Login Page','Admin Page','User Role','GeoIP','Hostname', 'Robot Threshold','Honey Pot','Feeds', 'Excluded URL');
-	$excluded_reason_tags = array('Robot' => 'robot','Browscap' => 'browscap','IP Match' => 'ipmatch','Self Referral' => 'selfreferral','Login Page' => 'loginpage','Admin Page' => 'adminpage','User Role' => 'userrole','Total' => 'total','GeoIP' => 'geoip','Hostname' => 'hostname','Robot Threshold' => 'robot_threshold','Honey Pot' => 'honeypot','Feeds' => 'feed', 'Excluded URL' => 'excluded_url');
-	$excluded_reason_db   = array('Robot' => 'robot','Browscap' => 'browscap','IP Match' => 'ip match','Self Referral' => 'self referral','Login Page' => 'login page','Admin Page' => 'admin page','User Role' => 'user role','Total' => 'total','GeoIP' => 'geoip','Hostname' => 'hostname','Robot Threshold' => 'robot_threshold','Honey Pot' => 'honeypot','Feeds' => 'feed', 'Excluded URL' => 'excluded url');
-	$excluded_reason_translate = array( 'Robot' => json_encode(__('Robot', 'wp_statistics')), 'Browscap' => json_encode(__('Browscap', 'wp_statistics')), 'IP Match' => json_encode(__('IP Match', 'wp_statistics')), 'Self Referral' => json_encode(__('Self Referral', 'wp_statistics')), 'Login Page' => json_encode(__('Login Page', 'wp_statistics')), 'Admin Page' => json_encode(__('Admin Page', 'wp_statistics')), 'User Role' => json_encode(__('User Role', 'wp_statistics')), 'Total' => json_encode(__('Total', 'wp_statistics')), 'GeoIP' => json_encode(__('GeoIP', 'wp_statistics')), 'Hostname' => json_encode(__('Hostname', 'wp_statistics')), 'Robot Threshold' => json_encode(__('Robot Threshold', 'wp_statistics')), 'Honey Pot' => json_encode(__('Honey Pot', 'wp_statistics')), 'Feeds' => json_encode(__('Feeds', 'wp_statistics') ), 'Excluded URL' => json_encode(__('Excluded URL', 'wp_statistics') ));
+	$excluded_reasons = array('Robot','Browscap','IP Match','Self Referral','Login Page','Admin Page','User Role','GeoIP','Hostname', 'Robot Threshold','Honey Pot','Feeds', 'Excluded URL', '404 Pages', 'Referrer Spam');
+	$excluded_reason_tags = array('Robot' => 'robot','Browscap' => 'browscap','IP Match' => 'ipmatch','Self Referral' => 'selfreferral','Login Page' => 'loginpage','Admin Page' => 'adminpage','User Role' => 'userrole','Total' => 'total','GeoIP' => 'geoip','Hostname' => 'hostname','Robot Threshold' => 'robot_threshold','Honey Pot' => 'honeypot','Feeds' => 'feed', 'Excluded URL' => 'excluded_url', '404 Pages' => 'excluded_404s', 'Referrer Spam' => 'referrer_spam' );
+	$excluded_reason_db   = array('Robot' => 'robot','Browscap' => 'browscap','IP Match' => 'ip match','Self Referral' => 'self referral','Login Page' => 'login page','Admin Page' => 'admin page','User Role' => 'user role','Total' => 'total','GeoIP' => 'geoip','Hostname' => 'hostname','Robot Threshold' => 'robot_threshold','Honey Pot' => 'honeypot','Feeds' => 'feed', 'Excluded URL' => 'excluded url', '404 Pages' => '404', 'Referrer Spam' => 'referrer_spam');
+	$excluded_reason_translate = array( 'Robot' => json_encode(__('Robot', 'wp_statistics')), 'Browscap' => json_encode(__('Browscap', 'wp_statistics')), 'IP Match' => json_encode(__('IP Match', 'wp_statistics')), 'Self Referral' => json_encode(__('Self Referral', 'wp_statistics')), 'Login Page' => json_encode(__('Login Page', 'wp_statistics')), 'Admin Page' => json_encode(__('Admin Page', 'wp_statistics')), 'User Role' => json_encode(__('User Role', 'wp_statistics')), 'Total' => json_encode(__('Total', 'wp_statistics')), 'GeoIP' => json_encode(__('GeoIP', 'wp_statistics')), 'Hostname' => json_encode(__('Hostname', 'wp_statistics')), 'Robot Threshold' => json_encode(__('Robot Threshold', 'wp_statistics')), 'Honey Pot' => json_encode(__('Honey Pot', 'wp_statistics')), 'Feeds' => json_encode(__('Feeds', 'wp_statistics') ), 'Excluded URL' => json_encode(__('Excluded URL', 'wp_statistics') ),'404 Pages' => json_encode(__('404 Pages', 'wp_statistics') ), 'Referrer Spam' => json_encode(__('Referrer Spam', 'wp_statistics') ) );
 	$excluded_results = array('Total' => array() );
 	$excluded_total = 0;
 	
@@ -37,7 +37,7 @@
 			$thisdate = $WP_Statistics->real_current_date('Y-m-d', '-'.$i, $rangeend_utime );
 		
 			// Create the SQL query string to get the data.
-			$query = "SELECT count FROM {$wpdb->prefix}statistics_exclusions WHERE reason = '{$thisreason}' AND date = '{$thisdate}'";
+			$query = $wpdb->prepare( "SELECT count FROM {$wpdb->prefix}statistics_exclusions WHERE reason = %s AND date = %s", $thisreason, $thisdate );
 
 			// Execute the query.
 			$excluded_results[$reason][$i] = $wpdb->get_var( $query );
@@ -54,6 +54,8 @@
 		}
 	}
 	
+	$excuded_all_time = $wpdb->get_var( "SELECT SUM(count) FROM {$wpdb->prefix}statistics_exclusions" );
+	
 	// If the chart totals is enabled, cheat a little and just add another reason category to the list so it get's generated later.
 	if( $total_stats == 1 ) { $excluded_reasons[] = 'Total'; }
 ?>
@@ -61,11 +63,8 @@
 	<?php screen_icon('options-general'); ?>
 	<h2><?php _e('Exclusions Statistics', 'wp_statistics'); ?></h2>
 
-	<?php wp_statistics_date_range_selector( 'wps_exclusions_menu', $daysToDisplay ); ?>
+	<?php wp_statistics_date_range_selector( WP_STATISTICS_EXCLUSIONS_PAGE, $daysToDisplay ); ?>
 
-	<br><br>
-	<h3><?php echo sprintf(__('Total Exclusions: %s', 'wp_statistics'), $excluded_total); ?></h3>
-	
 	<div class="postbox-container" style="width: 100%; float: left; margin-right:20px">
 		<div class="metabox-holder">
 			<div class="meta-box-sortables">
@@ -183,4 +182,36 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="postbox-container" style="width: 100%; float: left; margin-right:20px">
+		<div class="metabox-holder">
+			<div class="meta-box-sortables">
+				<div class="postbox">
+					<div class="handlediv" title="<?php _e('Click to toggle', 'wp_statistics'); ?>"><br /></div>
+					<h3 class="hndle"><span><?php _e('Hits Statistics Summary', 'wp_statistics'); ?></span></h3>
+					<div class="inside">
+						<table width="auto" class="widefat table-stats" id="summary-stats">
+							<tbody>
+								<tr>
+									<th></th>
+									<th class="th-center"><?php _e('Exclusions', 'wp_statistics'); ?></th>
+								</tr>
+								
+								<tr>
+									<th><?php _e('Chart Total', 'wp_statistics'); ?>:</th>
+									<th class="th-center"><span><?php echo number_format_i18n($excluded_total); ?></span></th>
+								</tr>
+								
+								<tr>
+									<th><?php _e('All Time Total', 'wp_statistics'); ?>:</th>
+									<th class="th-center"><span><?php echo number_format_i18n($excuded_all_time); ?></span></th>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
 </div>

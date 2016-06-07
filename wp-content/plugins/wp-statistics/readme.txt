@@ -1,10 +1,10 @@
 === WP Statistics ===
 Contributors: mostafa.s1990, GregRoss
-Donate link: http://mostafa-soufi.ir/donate/
+Donate link: http://wp-statistics.com/donate/
 Tags: statistics, stats, visit, visitors, chart, browser, blog, today, yesterday, week, month, year, total, post, page, sidebar, summary, feedburner, hits, pagerank, google, alexa, live visit
 Requires at least: 3.0
-Tested up to: 4.2
-Stable tag: 9.2
+Tested up to: 4.5
+Stable tag: 10.1
 License: GPL3
 
 Complete statistics for your WordPress site.
@@ -14,36 +14,33 @@ A comprehensive plugin for your WordPress visitor statistics, come visit us at o
 
 Track statistics for your WordPress site without depending on external services and uses arrogate data whenever possible to respect your users privacy.
 
-Now includes support for not storing IP addresses in the database!
-
 On screen statistics presented as graphs are easily viewed through the WordPress admin interface.
 
 This product includes GeoLite2 data created by MaxMind, available from http://www.maxmind.com.
 
 = Features =
-* User online, see how many people are currently viewing your site
-* Visits, see how many hits your site gets each day
-* Visitors, see who's visiting your site
-* Page tracking, see which pages are viewed most often
+* Online users, visits, visitors and page statistics
 * Search Engines, see search queries and redirects from popular search engines like Google, Bing, DuckDuckGo, Yahoo, Yandex and Baidu
+* Overview and detail pages for all kinds of data, including; browser versions, country stats, hits, exclusions, referrers, searches, search words and visitors
 * GeoIP location by Country
-* Support for not storing IP addresses in the database.
+* Support for hashing IP addresses in the database to protect your users privacy
 * Interactive map of visitors location
 * E-mail reports of statistics
 * Set access level for view and manage roles based on WordPress roles
-* Exclude user roles from statistics collection
-* Exclude robots from statistics collection
-* Exclude IP subnets from statistics collection
-* Exclude login/admin pages from statistics collection
+* Exclude users from statistics collection based on various criteria, including; user roles, common robots, IP subnets, page URL, login page, RSS pages, admin pages, Country, number of visits per day, hostname
 * Record statistics on exclusions
 * Automatic updates to the GeoIP database
 * Automatically prune the databases of old data
-* Export the data to Excel, XML, CSV or TSV files
-* Overview and detail pages for all kinds of data, including; browser versions, country stats, hits, exclusions, referrers, searches, search words and visitors
+* Export the data to XML, CSV or TSV files
 * Widget to provide information to your users
 * Shortcodes for many different types of data in both widgets and posts/pages
-* Dashboard widget for the admin area
+* Dashboard widgets for the admin area
 * Comprehensive Admin Manual
+
+= Translations =
+WP Statistics has been translated in to many languages, for the current list and contributors, please visit the [translators](https://wp-statistics.com/translators/) page on [wp-statistics.com](https://wp-statistics.com/).
+
+Translations are done by people just like you, help make WP Statistics available to more people around the world and [do a translation](http://wp-statistics.com/translations/) today!
 
 = Support =
 We're sorry you're having problem with WP Statistics and we're happy to help out.  Here are a few things to do before contacting us:
@@ -69,30 +66,6 @@ Still not having any luck? Open a new thread on one of the support forums and we
 * [English Support Forum](http://wordpress.org/support/plugin/wp-statistics)
 * [Persian Support Forum](http://forum.wp-parsi.com/forum/17-%D9%85%D8%B4%DA%A9%D9%84%D8%A7%D8%AA-%D8%AF%DB%8C%DA%AF%D8%B1/)
 
-= Translations =
-* English
-* Persian
-* Portuguese [Thanks](http://www.musicalmente.info/)
-* Romanian [Thanks Luke Tyler](http://www.nobelcom.com/)
-* French Thanks Anice Gnampa. Additional translations by Nicolas Baudet, eldidi and apeedn
-* Russian [Thanks Igor Dubilej](http://www.iflexion.com/)
-* Spanish Thanks Jose
-* Arabic [Thanks Hammad Shammari](http://www.facebook.com/aboHatim)
-* Turkish [Thanks aidinMC](http://www.artadl.ir/) & [Manset27.com](http://www.manset27.com/) & [Abdullah Manaz](http://www.manaz.net/)
-* Italian [Thanks Tony Bellardi](http://www.tonybellardi.com/) & Andrea Beducci
-* German [Thanks Andreas Martin](http://www.andreasmartin.com/) and Mike
-* Russian [Thanks Oleg](http://www.bestplugins.ru/)
-* Bengali [Thanks Mehdi Akram](http://www.shamokaldarpon.com/)
-* Serbian [Thanks Radovan Georgijevic](http://www.georgijevic.info/) & [Thanks Ogi Djuraskovic](http://firstsiteguide.com/)
-* Polish Thanks Radosław Rak and Tomasz Stulka.
-* Indonesian [Thanks Agit Amrullah](http://www.facebook.com/agitowblinkerz/)
-* Hungarian [Thanks ZSIMI](http://www.zsimi.hu/)
-* Chinese (Taiwan) [Thanks Toine Cheung](https://twitter.com/ToineCheung)
-* Chinese (China) [Thanks Toine Cheung](https://twitter.com/ToineCheung)
-* Dutch thanks Friso van Wieringen.
-
-Translations are done by people just like you, help make WP Statistics available to more people around the world and [do a translation](http://wp-statistics.com/translations/) today!
-
 == Installation ==
 1. Upload `wp-statistics` to the `/wp-content/plugins/` directory.
 2. Activate the plugin through the 'Plugins' menu in WordPress.
@@ -107,12 +80,9 @@ The admin manual is installed as part of the plugin, simply go to Statistics->Ma
 Disable / Enable the plugin.  You may also want to remove and re-install it.
 
 = All visitors are being set to unknown for their location? =
-Make sure you've downloaded the GeoIP database and the GeoIP code is enabled.  
+Make sure you've downloaded the GeoIP database and the GeoIP code is enabled.
 
 Also, if your running an internal test site with non-routable IP addresses (like 192.168.x.x or 172.28.x.x or 10.x.x.x), these addresses will come up as unknown always.
-
-= I was using V3.2 and now that I've upgraded my visitors and visits have gone way down? =
-The webcrawler detection code has been fixed and will now exclude them from your stats, don't worry, it now reflects a more accurate view of actual visitors to your site.
 
 = GeoIP is enabled but no hits are being counted? =
 The GeoIP code requires several things to function, PHP 5.3 or above, the bcmath extension, the cURL extension and PHP cannot be running in safe mode.  All of these conditions are checked for but there may be additional items required.  Check your PHP log files and see if there are any fatal errors listed.
@@ -127,7 +97,9 @@ Be very careful to set the subnet mask correctly on the subnet list, it is very 
 Make sure you have WordPress configured correctly for SMTP and also check your WP Cron is working correctly.  You can use [Cron View](http://wordpress.org/plugins/cron-view) to examine your WP Cron table and see if there are any issues.
 
 = Does WP Statistics support multi-site? =
-WP Statistics hasn't been tested with multi-site and there have been some issues reported with getting it enabled correctly on all sites in a network.
+WP Statistics doesn't officially support multi-site however it does have limited functionally associated with it and should function without issue.  However no support is provided at this time.
+
+Version 8.8 is the first release that should install, upgrade and remove correctly on mutli-site as well as have some very basic support for the network admin menu.  This should not be taken as an indication that WP Statistics fully support for multi-site, but only as a very preliminary first step.
 
 = Does WP Statistics report on post hits? =
 Yes, version 6.0 has introduced page hit statistics!
@@ -171,7 +143,7 @@ Services that use centralized databases, like Google Analytics, for spam and rob
 
 = When I upgrade or install WP Statistics I get an error message like "Parse error: syntax error, unexpected T_STRING, expecting T_CONSTANT_ENCAPSED_STRING or '('" =
 
-Since WP Statistics 8.0, PHP 5.3 or above has been required.  If you are using an older version of PHP it cannot understand the new syntax included in WP Statistics 8.0 and generates a parse error. 
+Since WP Statistics 8.0, PHP 5.3 or above has been required.  If you are using an older version of PHP it cannot understand the new syntax included in WP Statistics 8.0 and generates a parse error.
 
 Your hosting provider should have a newer version of PHP available, sometimes you must activate it through your hosting control panel.
 
@@ -201,6 +173,54 @@ Search Engine Referrals and Words are highly dependent on the search engine prov
 
 There can be many reasons for this, but the most common reason is a botnet has decided to visit your site and we have been unable to filter it out.  You usually see your visits spike for a few days and then they give up.
 
+= What’s the difference between Visits and Visitors? =
+
+Visits is the number of page hits your site has received.
+
+Visitors is the number of unique users that have visited your site.
+
+Visits should always be greater than Visitors (though there are a few times when this won’t be true on very low usage sites due to how the exclusion code works).
+
+The average number of pages a visitor views on your site is Visits/Visitors.
+
+= My overview screen is blank, what's wrong? =
+
+This is usually caused by a PHP fatal error, check the page source and PHP logs.
+
+The most common fatal error is an out of memory error. Check the Statistics->Optimization page and see how much memory is currently assigned to PHP and how much the overview is using.
+
+If it is a memory issue you have two choices:
+ - Increase PHP's memory allocation
+ - Delete some of your historical data.
+
+See http://php.net/manual/en/ini.core.php#ini.memory-limit for information about PHP's memory limit.
+
+To remove historical data you can use the Statistics->Optimization->Purging->Purge records older than.
+
+= Not all referrals are showing up in the search words list, why? =
+
+Unfortunate we're completely dependent on the search engine sending use the search parameters as part of the referrer header, which they do not always do.
+
+= Does WP Statistics work with caching plugins? =
+
+Probably not, most caching plugins don't execute the standard WordPress loop for a page it has already cached (by design of course) which means the WP Statistics code never runs for that page.
+
+This means WP Statistics can't record the page hit or visitor information, which defeats the purpose of WP Statistics.
+
+We do not recommend using a caching plugin along with WP Statistics.
+
+= I get an error message like "PHP Fatal error: Function name must be a string in /../parse-user-agent.php" =
+
+Do you have eAccelerator installed?  If so this is a known issue with eAccelerator and PHP's "anonymous" functions, which are used in the user agent parsing library.  As no new versions of eAccelerator have been released for over 3 years, you should look to replace it or disable it.
+
+= I've installed WP Statistics for the first time on a site and when I go to the statistics pages I get an error saying like "The following plugin table(s) do not exist in the database" =
+
+This is because something has gone wrong during the installation.
+
+At the end of the message will be a list of tables that are missing, you can use the provided link to re-run the installation routine.  If that does not resolve the issue and the visitors table is the only table listed, you may want to check your MySQL version.  Some older versions of MySQL (in the 5.0.x series) have issues with complex compound indexes, which we use on the visitors table.  If this is the case, check with your hosting provider and see if they can upgrade to a newer version of MySQL.
+
+If you still have issues open a new thread on the support forum and we'll try and resolve it for you.
+
 == Screenshots ==
 1. View stats page.
 2. View latest search words.
@@ -214,25 +234,197 @@ There can be many reasons for this, but the most common reason is a botnet has d
 10. View latest search engine referrers Statistics page.
 
 == Upgrade Notice ==
-= 9.2 = 
-If upgrading from pre-9.0, please make sure to backup your database before installing.  Once installed, please go to Statistics->Optimization->Database and add the visits index.
-
-= 9.1.3 =
-If upgrading from pre-9.0, please make sure to backup your database before installing.  Once installed, please go to Statistics->Optimization->Database and add the visits index.
-
-= 9.1.2 =
-If upgrading from pre-9.0, please make sure to backup your database before installing.  Once installed, please go to Statistics->Optimization->Database and add the visits index.
-
-= 9.1.1 =
-If upgrading from pre-9.0, please make sure to backup your database before installing.  Once installed, please go to Statistics->Optimization->Database and add the visits index.
-
-= 9.1 =
-BACKUP YOUR DATABASE BEFORE INSTALLING!  This release alters the table structure of the database.  Once installed, please go to Statistics->Optimization->Database and add the visits index.
-
-= 9.0 =
-This release updates some core code to do with timezones, hence the change to version 9.0, if you see any issues with timezones, please let us know.  In addition, you may see an increase in your visits count as a race condition that dropped some visits has been resolved.
+= 10.1 =
+This is primarily a maintenance release with updates to various libraries and bug fixes.
 
 == Changelog ==
+= 10.1 =
+* Release Date: April 3, 2016
+* Updated: Top pages page to list the stats for the selected date range in the page list.
+* Updated: Added check for gzopen() function to the Optimization page as some builds of PHP are broken and do not include it which causes the GeoIP download to fail causing a white screen of death in some cases.
+* Updated: Added check to make sure we can write to the upload directory before doing so.
+* Updated: User Agent Parser library updated to V0.5.1.
+* Updated: MaxMind Reader Library updated to V1.1.
+* Fixed: Only display the widgets on the overview page that have their features enabled.
+* Fixed: Top pages list failed when there were less than 5 pages to display.
+* Fixed: Manual download links did not function.
+* Fixed: Typo in function name for purging the database.
+* Fixed: Renamed the Czech and Danish translation file names to function correctly.
+* Fixed: Ensure we have a valid page id before record the stat to the database to avoid an error being recorded in the PHP error log.
+
+= 10.0.5 =
+* Release Date: February 5, 2016
+* Fixed: Date range selector display after entering a custom date range.
+* Fixed: Date ranges that ended in the past displaying the wrong visit/visitors data.
+
+= 10.0.4 =
+* Release Date: January 21, 2016
+* Fixed: Recent Visitors widget in the dashboard did not work.
+* Fixed: Top Visitors in Overview page would not reload.
+* Fixed: Links for yesterday and older visitors count went to wrong page.
+* Fixed: Typo in purge code that caused a fatal error.
+
+= 10.0.3 =
+* Release Date: January 19, 2016
+* Updated: Google map API now always uses https.
+* Fixed: Google map error that broken the overview page display of charts and the map.
+
+= 10.0.2 =
+* Release Date: January 19, 2016
+* Added: Additional error checking on widget load so they will retry if there is a failure.
+* Fixed: Added code to flush out invalid widget order user meta.
+* Fixed: Include Fatal Error if corrupt data was passed to the ajax widget code.
+
+= 10.0.1 =
+* Release Date: January 18, 2016
+* Fixed: If you re-ordered the widgets on the overview screen and then reloaded the page, all the widgets would disappear.
+
+= 10.0 =
+* Release Date: January 15, 2016
+* Added: Widgets now support reloading on overview and dashboard screen.
+* Updated: Overview screen now loads widgets dynamically to reduce memory usage.
+* Updated: Dashboard widgets now load dynamically.
+* Updated: Enabling dashboard widgets now no longer require a page load to display the contents.
+* Updated: Replaced the old eye icon and "more..." link on the right of the title on the overview widgets with a new icon on the right beside the open/close icon.
+* Fixed: Removed extraneous single quote in SQL statement on referrers page, thanks jhertel.
+* Fixed: Order of parameters in referrers page when viewing individual referrers was incorrect and resulted in a blank list.
+* Fixed: UpdatedSQL for last post date detection to order by post_date instead of ID as someone could enter a date in the past for their publish date.  Thanks PC1271 for the fix.
+* Fixed: The referrers widget would only select the first 100k records due to a limit in PHP/MySQL, it will now select all records.
+* Removed: Widget selection and ordering from the settings page, the "Screen Options" tab can now be used on the enabled/disable widgets and drag and drop will remember their location.
+* Removed: Overview page memory usage in the optimization page as it is no longer relevant.
+
+= 9.7 =
+* Release Date: December 30, 2015
+* Added: A date range to the referrers page.
+* Added: A Date range selector to browsers page.
+* Updated: General SQL cleanups.
+* Updated: browscap library to 2.1.1.
+* Updated: GeoIP library to 2.3.3.
+* Updated: phpUserAgent library to 0.5
+
+= 9.6.6 =
+* Release Date: November 1, 2015
+* Updated: Use timezone corrected dates for date pickers.
+* Updated the get_ip code to return 127.0.0.1 if no IP address is found (can happen when a user runs WordPress from a command line function, like when setting up a scheduled cron job).
+* Fixed: Several security related updates, thanks CodeV.
+
+= 9.6.5 =
+* Release Date: September 18, 2015
+* Updated: Updated support libraries, including browscap (2.0.5) and GeoIP (webservices).
+* Updated: The hits column in the post/pages list no longer requires manage permissions but instead view permission.
+* Fixed: New browscap.ini format was causing fatal errors in certain circumstances.
+* Fixed: Missing close tag on the summary widget's users online link.
+* Fixed: When purging data an incorrect column name was used when updating the historical table.
+
+= 9.6.4 =
+* Release Date: September 15, 2015
+* Updated: Support new browscap.ini file format.
+
+= 9.6.3 =
+* Release Date: September 11, 2015
+* Updated: The database update nag link to the optimization page instead of the settings page.
+* Updated: Handle the case where the downloads haven't happened yet.
+* Fixed: In some cases the extenrals tab would show the wrong date for the next scheduled update.
+* Fixed: In some cases the Piwik and other features may not be enabled even when the checkboxes were selected.
+* Fixed: If no page id was passed in on the pagestats shortcode the wrong default for page id would be used and no stats would be displayed.
+
+= 9.6.2 =
+* Release Date: September 5, 2015
+* Added: Search table to the empty table list.
+* Added: Search table size to the optimization page.
+* Added: Updated SQL calls to the pages table to use $wpdb->prepare() to protect against SQL inject attacks.
+* Fixed: Check of $wp_roles type as it is an object and not an array which caused only admins to be able to view the statistics.
+* Fixed: Top referring only displayed search engines.
+* Updated: Layout of the maintenance tab.
+
+= 9.6.1 =
+* Release Date: September 4, 2015
+* Fixed: Error with undeclared global $WP_Statistics when updating the database.
+* Added: Re-validation of the current database updates required when loading the optimization page.
+
+= 9.6 =
+* Release Date: September 3, 2015
+* Added: New admin notices for if the database requires updates.
+* Added: Page/post id field to pagestats shortcode.
+* Added: Ask.com to search engine list, disabled by default.
+* Fixed: Display of the dashboard referrers widget.
+* Fixed: incorrect table name when dropping the old 'AString' field.
+* Fixed: Error message if the global $wp_roles hadn't been set when we accessed it.
+* Fixed: When exporting, no data was exported.
+* Fixed: When excluding countries, multiple entries would not be parsed correctly.
+* Updated: Purging code now includes the search table.
+* Updated: Search conversion code to limit the number of records retreived to 10000 and then loop through them to ensure we don't run out of memory during the conversion process.
+* Updated: Cleaned up the admin notices code.
+* Updated: Persian translation. Thanks Ali Zeinali.
+
+= 9.5.3 =
+* Release Date: August 19, 2015
+* Added: More robust error reporting if a plugin table is missing.
+* Added: Support to export the search table.
+* Fixed: The install script for older versions of MySQL (5.0.x).
+* Fixed: Export script no longer generates errors when exporting an empty table.
+* Fixed: WP_Debug error on $crawler when it was an object but didn't have the right properties (aka wasn't the right object).
+* Fixed: Sidebar widget works again in WordPress 4.3.
+
+= 9.5.2 =
+* Release Date: August 8, 2015
+* Fixed: XSS issue with top-referrers page, thanks Swift Security (http://swiftsecurity.swte.ch/).
+* Updated: If the GeoIP code is disabled, the warning message was pointing to the old GeoIP tab instead of the new Externals tab.
+* Updated: French translation.
+
+= 9.5.1 =
+* Release Date: August 4, 2015
+* Fixed: Issue with verifying the WP Statistics tables exist on databases with hyphens in their names.
+* Updated: Arabic translation.
+
+= 9.5 =
+* Release Date: August 3, 2015
+* Added: Referrer Spam exclusions using the Piwik Referrer Spam Blacklist (see Statistics->Settings->Externals to enable).
+* Added: Code to remove 'AString' column if it exists in the visitors table during upgrades (bug in a older previous version of WP Statistics erroneously created it).
+* Fixed: Duplicate key name warning during upgrades for 'date_ip_agent' index.
+* Fixed: Warning on 'date_ip' index does not exist when trying to drop it during upgrades.
+* Updated: Storing of search engine/words data is now in it's own table for better performance.
+* Updated: Combined the GeoIP and browscap tabs in settings in to the Externals tab.
+* Updated: GeoIP library to V 2.3.1.
+
+= 9.4.1 =
+* Release Date: July 9, 2015
+* Fixed: SQL injection security issue for users with access to the admin pages.
+* Fixed: Bug in code to save new "Treat corrupt browser info as a bot" setting.
+* Fixed: Bug in scheduled data pruge code that would not append the correct table prefix.
+* Updated: Admin manual.
+
+= 9.4 =
+* Release Date: July 3, 2015
+* Added: Date selector to top visitors page.
+* Added: Option to exclude WordPress's "Not Found" page from the statistics.
+* Added: Option to treat corrupt http header information as bots (missing IP addresses or user agents).
+* Added: New robots to list; 007ac9, 5bot, advbot, alphabot, anyevent, blexbot, bubing, cliqzbot, dl2bot, duckduckgo, EveryoneSocialBot, findxbot, glbot, linkapediabot, ltx71, mediabot, medialbot, monobot, OrangeBot, owler, pageanalyzer, porkbun, pr-cy, pwbot, r4bot, revip, riddler, rogerbot, sistrix, SputnikBot, u2bot, uni5download, unrulymedia, wsowner, wsr-agent, x100bot and xzybot
+* Fixed: Make sure the admin bar only appears for users that have read/manage permissions in WP Statistics.
+* Updated: Split the access and exclusions tabs in settings.
+
+= 9.3.1 =
+* Release Date: May 15, 2015
+* Fixed: Typo in options name that caused the visitors map to never be displayed.
+
+= 9.3 =
+* Release Date: May 15, 2015
+* Added: Shortcode UI (aka ShortCake) support.
+* Added: Donation menu and dismissble banner on the overview page.
+* Added: Applebot, Superfeedr, jetmon, sfFeedReader and feedzirra to the robots list.
+* Added: Summary postbox on hit statistics page.
+* Added: Summary postbox on exclusions page.
+* Added: Date range selector on top countries page.
+* Added: Purge data based on visitor's hit count on the optimization page.
+* Added: Option to purge data based on visitor's hit count on a daily basis.
+* Added: Option to record the page title for search referrals that do not contain a query value.
+* Updated: Moved all ajax and pseudo ajax calls to use the standard WordPress ajax and init routines instead of using wp-load.php.
+* Updated: Widgets and pages will only be displayed if the associated statistics is being collected, for example the search engine referrals will only be displayed if the visitor tracking option is enabled.
+* Fixed: Typo in variable name for one of the dashboard widgets.
+* Fixed: PHP error when the $browser object wasn't an object when we checked the crawler property.
+* Fixed: Incorrect parameter for get_option() on two option in the settings page.
+* Fixed: Widget's didn't translate correctly.
+
 = 9.2 =
 * Release Date: April 26, 2015
 * Added: Date range selector for charts now supports arbitrary date ranges with JavaScript date selector.
@@ -304,13 +496,13 @@ This release updates some core code to do with timezones, hence the change to ve
 * Added: RSS feed URL's can now be excluded.
 * Added: Option to set the country code for private IP addresses.
 * Fixed: Additional WP_DEBUG warning fixes.
-* Fixed: Incorrect parameter list in get_home_url() when checking for self referrals. 
+* Fixed: Incorrect parameter list in get_home_url() when checking for self referrals.
 * Fixed: Single quotes can now be used in the report content without being escaped.
 * Fixed: Referrers menu item was misspelled.
 * Updated: Italian, French, Polish, Arabic, Persian and Chinese translation.
 * Updated: Widget now formats numbers with international standards.
 * Updated: Short codes now support three number formatting options; i18n, english or none.
-* Updated: Removed old throttling code for hits which is no longer required. 
+* Updated: Removed old throttling code for hits which is no longer required.
 * Updated: IP address exclusions without a subnet mask now assume a single IP address instead of all IP addresses.
 
 = 8.7.2 =
@@ -574,7 +766,7 @@ This release updates some core code to do with timezones, hence the change to ve
 * Added: Page tracking support.  Includes new overview widget and detail page.  Also supports page hit count in the pages/post list and in the page/post editor.
 * Added: Admin manual, online viewing as well as downloadable version.
 * Added: Links for “Settings”, “WordPress Plugin Page” and “Rate” pages to the plugin list for WP Statistics.
-* Updated: General settings tab re-organization. 
+* Updated: General settings tab re-organization.
 * Updated: Several typo's and other minor issues.
 * Updated: Highcharts JS v3.0.9 to JS v4.0.1.
 * Updated: Persian (fa_IR) language.
@@ -607,7 +799,7 @@ This release updates some core code to do with timezones, hence the change to ve
 * Release Date: March 10, 2014
 * Added: Additional checks for BC Math and cURL which are required for the GeoIP code.
 * Updated: GeoIP database handling if it is missing or invalid.
-* Updated: GeoIP database is now stored in uploads/wp-statistics directory so it does not get overwritten during upgrades. 
+* Updated: GeoIP database is now stored in uploads/wp-statistics directory so it does not get overwritten during upgrades.
 * Fixed: Typo's in the shortcode codes (thanks 	g33kg0dd3ss).
 * Updated: Polish (pl_PL) language.
 
@@ -671,7 +863,7 @@ This release updates some core code to do with timezones, hence the change to ve
 * Fixes: Bug in the robots code that on new installs failed to populate the defaults in the database.
 * Fixes: All known warning messages when running in WordPress debug mode.
 * Fixes: Incorrect description of co-efficient value in the setting page.
-* Fixes: Top level links on the various stats pages now update highlight the current page in the admin menu instead of the overview page. 
+* Fixes: Top level links on the various stats pages now update highlight the current page in the admin menu instead of the overview page.
 * Fixes: Install code now only executes on a true new installation instead of on each activation.
 * Fixes: Bug in hits code when GeoIP was disabled, IP address would not be recorded.
 
@@ -690,7 +882,7 @@ This release updates some core code to do with timezones, hence the change to ve
 * Release Date: January 16, 2014
 * Added: option to set the required capability level to view statistics in the admin interface.
 * Added: option to set the required capability level to manage statistics in the admin interface.
-* Fixes: 'See More' links on the overview page now update highlight the current page in the admin menu instead of the overview page. 
+* Fixes: 'See More' links on the overview page now update highlight the current page in the admin menu instead of the overview page.
 * Added: Schedule downloads of the GeoIP database.
 * Added: Auto populate missing GeoIP information after a download of the GeoIP database.
 * Fixes: Unschedule of report event if reporting is disabled.

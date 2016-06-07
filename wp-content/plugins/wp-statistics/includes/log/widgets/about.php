@@ -1,18 +1,4 @@
 <?php
-	function wp_statistics_generate_about_postbox($ISOCountryCode, $search_engines) {
-	
-		global $wpdb, $WP_Statistics;
-?>
-				<div class="postbox">
-					<div class="handlediv" title="<?php _e('Click to toggle', 'wp_statistics'); ?>"><br /></div>
-					<h3 class="hndle"><span><?php echo sprintf(__('About WP Statistics Version %s', 'wp_statistics'), WP_STATISTICS_VERSION); ?></span></h3>
-					<div class="inside">
-					<?php wp_statistics_generate_about_postbox_content(); ?>
-					</div>
-				</div>
-<?php		
-	}
-
 	function wp_statistics_generate_about_postbox_content() {
 	
 		global $wpdb, $WP_Statistics;
@@ -27,7 +13,7 @@
 <?php
 							if(current_user_can(wp_statistics_validate_capability($WP_Statistics->get_option('manage_capability', 'manage_options')))) {
 ?>
-							| <p><a href="?page=wp-statistics/settings&tab=about"><?php _e('More Information', 'wp_statistics'); ?></a></p>
+							| <p><a href="?page=<?php echo WP_STATISTICS_SETTINGS_PAGE; ?>&tab=about"><?php _e('More Information', 'wp_statistics'); ?></a></p>
 <?php
 							}
 ?>

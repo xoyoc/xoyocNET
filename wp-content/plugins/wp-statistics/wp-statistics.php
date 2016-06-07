@@ -3,7 +3,7 @@
 Plugin Name: WP Statistics
 Plugin URI: http://wp-statistics.com/
 Description: Complete statistics for your WordPress site.
-Version: 9.2
+Version: 10.1
 Author: Mostafa Soufi & Greg Ross
 Author URI: http://wp-statistics.com/
 Text Domain: wp_statistics
@@ -12,16 +12,34 @@ License: GPL2
 */
 
 	// These defines are used later for various reasons.
-	define('WP_STATISTICS_VERSION', '9.2');
+	define('WP_STATISTICS_VERSION', '10.1');
 	define('WP_STATISTICS_MANUAL', 'manual/WP Statistics Admin Manual.');
 	define('WP_STATISTICS_REQUIRED_PHP_VERSION', '5.3.0');
 	define('WP_STATISTICS_REQUIRED_GEOIP_PHP_VERSION', WP_STATISTICS_REQUIRED_PHP_VERSION);
 	define('WPS_EXPORT_FILE_NAME', 'wp-statistics');
+	
+	define('WP_STATISTICS_OVERVIEW_PAGE', 'wps_overview_page' );
+	define('WP_STATISTICS_BROWSERS_PAGE', 'wps_browsers_page' );
+	define('WP_STATISTICS_COUNTRIES_PAGE', 'wps_countries_page' );
+	define('WP_STATISTICS_EXCLUSIONS_PAGE', 'wps_exclusions_page' );
+	define('WP_STATISTICS_HITS_PAGE', 'wps_hits_page' );
+	define('WP_STATISTICS_ONLINE_PAGE', 'wps_online_page' );
+	define('WP_STATISTICS_PAGES_PAGE', 'wps_pages_page' );
+	define('WP_STATISTICS_REFERRERS_PAGE', 'wps_referrers_page' );
+	define('WP_STATISTICS_SEARCHES_PAGE', 'wps_searches_page' );
+	define('WP_STATISTICS_WORDS_PAGE', 'wps_words_page' );
+	define('WP_STATISTICS_TOP_VISITORS_PAGE', 'wps_top_visitors_page' );
+	define('WP_STATISTICS_VISITORS_PAGE', 'wps_visitors_page' );
+	define('WP_STATISTICS_OPTIMIZATION_PAGE', 'wps_optimization_page' );
+	define('WP_STATISTICS_SETTINGS_PAGE', 'wps_settings_page' );
+	define('WP_STATISTICS_DONATE_PAGE', 'wps_donate_page' );
+	define('WP_STATISTICS_MANUAL_PAGE', 'wps_manual_page' );
 
-	// Load the internationalization code.
-	function wp_statistics_init() {
+	// Load the translation code.
+	function wp_statistics_language() {
 		GLOBAL $WP_Statistics;
 		
+		// Users can override loading the default language code, check to see if they have.
 		$override = false;
 		
 		if( is_object( $WP_Statistics ) ) {
@@ -30,6 +48,7 @@ License: GPL2
 			}
 		}
 		
+		// If not, go ahead and load the translations.
 		if( !$override ) {
 			load_plugin_textdomain('wp_statistics', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/');
 			__('WP Statistics', 'wp_statistics');
@@ -37,16 +56,59 @@ License: GPL2
 		}
 	}
 
-	// Add actions
-	add_action('init', 'wp_statistics_init');
+	// Add translation action.  We have to load the translation code before the init otherwise the widgets won't get translated properly.
+	add_action('plugins_loaded', 'wp_statistics_language');
+	
+	// Load the init code.
+	function wp_statistics_init() {
+		GLOBAL $WP_Statistics;
+		
+		// Check to see if we're exporting data, if so, do so now. 
+		// Note this will set the headers to download the export file and then stop running WordPress.
+		if( array_key_exists( 'wps_export', $_POST ) ) {
+			include_once dirname( __FILE__ ) . '/includes/functions/export.php';
+			wp_statistics_export_data();
+		}
 
-	function wp_statistics_php_after_plugin_row() {
-		echo '<tr><th scope="row" class="check-column"></th><td class="plugin-title" colspan="10"><span style="padding: 3px; color: white; background-color: red; font-weight: bold">&nbsp;&nbsp;' . __('ERROR: WP Statistics has detected an unsupported version of PHP, WP Statistics will not function without PHP Version ', 'wp_statistics') . WP_STATISTICS_REQUIRED_PHP_VERSION . __(' or higher!', 'wp_statistics') . '  ' . __('Your current PHP version is','wp_statistics') . ' ' . phpversion() . '.&nbsp;&nbsp;</span></td></tr>';
+		// Check to see if we're downloading the manual, if so, do so now. 
+		// Note this will set the headers to download the manual and then stop running WordPress.
+		if( array_key_exists( 'wps_download_manual', $_GET ) ) {
+			include_once dirname( __FILE__ ) . '/includes/functions/manual.php';
+			wp_statistics_download_manual();
+		}
+	}
+
+	// Add init actions.  For the main init we're going to set our priority to 9 to execute before most plugins so we can export data before and set the headers without 
+	// worrying about bugs in other plugins that output text and don't allow us to set the headers.
+	add_action('init', 'wp_statistics_init', 9);
+	
+	function wp_statistics_unsupported_version_admin_notice() {
+		global $wp_version;
+		
+		$screen = get_current_screen();
+		
+		if( 'plugins' !== $screen->id ) {
+			return;
+		}
+	?>
+		<div class="error">
+			<p style="max-width:800px;"><b><?php _e( 'WP Statistics Disabled', 'wp_statistics');?></b> <?php _e('&#151; You are running an unsupported version of PHP.', 'glotpress' ); ?></p>
+
+			<p style="max-width:800px;"><?php 
+			
+			echo sprintf( __( 'WP Statistics has detected PHP version %s which is unsupported, WP Statistics requires PHP Version %s or higher!', 'wp_statistics'), phpversion(), WP_STATISTICS_REQUIRED_PHP_VERSION );
+			echo '</p><p>';
+			echo __( 'Please contact your hosting provider to upgrade to a supported version or disable WP Statistics to remove this message.' );
+			?></p>
+		</div>
+		
+	<?php
 	}
 	
 	// Check the PHP version, if we don't meet the minimum version to run WP Statistics return so we don't cause a critical error.
 	if( !version_compare( phpversion(), WP_STATISTICS_REQUIRED_PHP_VERSION, ">=" ) ) { 
-		add_action('after_plugin_row_' . plugin_basename( __FILE__ ), 'wp_statistics_php_after_plugin_row', 10, 2);
+		add_action( 'admin_notices', 'wp_statistics_unsupported_version_admin_notice', 10, 2 );
+
 		return; 
 	} 
 
@@ -54,7 +116,8 @@ License: GPL2
 	if( get_option( 'wp_statistics_removal' ) == 'true' ) {
 		include_once( dirname( __FILE__ ) . '/wps-uninstall.php' );
 	}
-	
+
+	// This adds a row after WP Statistics in the plugin page IF we've been removed via the settings page.
 	function wp_statistics_removal_after_plugin_row() {
 		echo '<tr><th scope="row" class="check-column"></th><td class="plugin-title" colspan="*"><span style="padding: 3px; color: white; background-color: red; font-weight: bold">&nbsp;&nbsp;' . __('WP Statistics has been removed, please disable and delete it.', 'wp_statistics') . '&nbsp;&nbsp;</span></td></tr>';
 	}
@@ -66,7 +129,7 @@ License: GPL2
 	}
 	
 	// Load the user agent parsing code first, the WP_Statistics class depends on it.  Then load the WP_Statistics class.
-	include_once dirname( __FILE__ ) . '/includes/functions/parse-user-agent.php';
+	include_once dirname( __FILE__ ) . '/vendor/donatj/phpuseragentparser/Source/UserAgentParser.php';
 	include_once dirname( __FILE__ ) . '/includes/classes/statistics.class.php';
 	
 	// This is our global WP_Statitsics class that is used throughout the plugin.
@@ -96,34 +159,60 @@ License: GPL2
 	include_once dirname( __FILE__ ) . '/editor.php';
 	include_once dirname( __FILE__ ) . '/shortcode.php';
 	include_once dirname( __FILE__ ) . '/schedule.php';
+	include_once dirname( __FILE__ ) . '/ajax.php';
 	
 	// This function outputs error messages in the admin interface if the primary components of WP Statistics are enabled.
 	function wp_statistics_not_enable() {
 		GLOBAL $WP_Statistics;
-		
+
 		// If the user had told us to be quite, do so.
 		if( !$WP_Statistics->get_option('hide_notices') ) {
-			$get_bloginfo_url = get_admin_url() . "admin.php?page=wp-statistics/settings";
-			
-			if( !$WP_Statistics->get_option('useronline') )
-				echo '<div class="update-nag"><p>'.sprintf(__('Online user tracking in WP Statistics is not enabled, please go to %s and enable it.', 'wp_statistics'), '<a href="' . $get_bloginfo_url . '">' . __( 'setting page', 'wp_statistics') . '</a>').'</p></div>';
 
-			if( !$WP_Statistics->get_option('visits') )
-				echo '<div class="update-nag"><p>'.sprintf(__('Hit tracking in WP Statistics is not enabled, please go to %s and enable it.', 'wp_statistics'), '<a href="' . $get_bloginfo_url . '">' . __( 'setting page', 'wp_statistics') . '</a>').'</p></div>';
+			// Check to make sure the current user can manage WP Statistics, if not there's no point displaying the warnings.
+			$manage_cap = wp_statistics_validate_capability( $WP_Statistics->get_option('manage_capability', 'manage_options') );
+			if( ! current_user_can( $manage_cap ) ) { return; }
 
-			if( !$WP_Statistics->get_option('visitors') )
-				echo '<div class="update-nag"><p>'.sprintf(__('Visitor tracking in WP Statistics is not enabled, please go to %s and enable it.', 'wp_statistics'), '<a href="' . $get_bloginfo_url . '">' . __( 'setting page', 'wp_statistics') . '</a>').'</p></div>';
+			$get_bloginfo_url = get_admin_url() . "admin.php?page=" . WP_STATISTICS_SETTINGS_PAGE;
 			
-			if(!$WP_Statistics->get_option('geoip') && wp_statistics_geoip_supported())
-				echo '<div class="update-nag"><p>'.sprintf(__('GeoIP collection is not active, please go to %s and enable this feature.', 'wp_statistics'), '<a href="' . $get_bloginfo_url . '&tab=geoip">' . __( 'Setting page > GeoIP', 'wp_statistics') . '</a>').'</p></div>';
+			$itemstoenable = array();
+			if( !$WP_Statistics->get_option('useronline') ) { $itemstoenable[] = __('online user tracking', 'wp_statistics'); }
+			if( !$WP_Statistics->get_option('visits') ) { $itemstoenable[] = __('hit tracking', 'wp_statistics'); }
+			if( !$WP_Statistics->get_option('visitors') ) { $itemstoenable[] = __('visitor tracking', 'wp_statistics'); }
+			if( !$WP_Statistics->get_option('geoip') && wp_statistics_geoip_supported()) { $itemstoenable[] = __('geoip collection', 'wp_statistics'); }
+
+			if( count( $itemstoenable ) > 0 )
+				echo '<div class="update-nag">'.sprintf(__('The following features are disabled, please go to %s and enable them: %s', 'wp_statistics'), '<a href="' . $get_bloginfo_url . '">' . __( 'settings page', 'wp_statistics') . '</a>', implode(__(',', 'wp_statistics'), $itemstoenable)).'</div>';
+
+			$get_bloginfo_url = get_admin_url() . "admin.php?page=" . WP_STATISTICS_OPTIMIZATION_PAGE . "&tab=database";
+
+			$dbupdatestodo = array();
+			
+			if(!$WP_Statistics->get_option('search_converted')) { $dbupdatestodo[] = __('search table', 'wp_statistics'); }
+
+			// Check to see if there are any database changes the user hasn't done yet.
+			$dbupdates = $WP_Statistics->get_option('pending_db_updates', false);
+
+			// The database updates are stored in an array so loop thorugh it and output some notices.
+			if( is_array( $dbupdates ) ) { 
+				$dbstrings = array( 'date_ip_agent' => __('countries database index', 'wp_statistics'), 'unique_date' => __('visit database index', 'wp_statistics') );
+			
+				foreach( $dbupdates as $key => $update ) {
+					if( $update == true ) {
+						$dbupdatestodo[] = $dbstrings[$key];
+					}
+				}
+	
+			if( count( $dbupdatestodo ) > 0 ) 
+				echo '<div class="update-nag">'.sprintf(__('Database updates are required, please go to %s and update the following: %s', 'wp_statistics'), '<a href="' . $get_bloginfo_url . '">' . __( 'optimization page', 'wp_statistics') . '</a>', implode(__(',', 'wp_statistics'), $dbupdatestodo)).'</div>';
+
+			}
 		}
 	}
 
-	if( !$WP_Statistics->get_option('useronline') || !$WP_Statistics->get_option('visits') || !$WP_Statistics->get_option('visitors') || !$WP_Statistics->get_option('geoip') ) {
-		if( isset( $pagenow ) && array_key_exists( 'page', $_GET ) ) {
-			if( $pagenow == "admin.php" && substr( $_GET['page'], 0, 14) == 'wp-statistics/') {
-				add_action('admin_notices', 'wp_statistics_not_enable');
-			}
+	// Display the admin notices if we should.
+	if( isset( $pagenow ) && array_key_exists( 'page', $_GET ) ) {
+		if( $pagenow == "admin.php" && substr( $_GET['page'], 0, 14) == 'wp-statistics/') {
+			add_action('admin_notices', 'wp_statistics_not_enable');
 		}
 	}
 
@@ -139,6 +228,7 @@ License: GPL2
 		}
 	}
 
+	// If we've been told to exclude the feeds from the statistics add a detection hook when WordPress generates the RSS feed.
 	if( $WP_Statistics->get_option('exclude_feeds') ) {
 		add_filter('the_title_rss', 'wp_statistics_check_feed_title' );
 	}
@@ -192,6 +282,10 @@ License: GPL2
 		if( $WP_Statistics->get_option('update_browscap') )
 			wp_statistics_download_browscap();
 		
+		// Check to see if the referrerspam database needs to be downloaded and do so if required.
+		if( $WP_Statistics->get_option('update_referrerspam') )
+			wp_statistics_download_referrerspam();
+		
 		if( $WP_Statistics->get_option('send_upgrade_email') ) {
 			$WP_Statistics->update_option( 'send_upgrade_email', false );
 			
@@ -216,7 +310,7 @@ License: GPL2
 		$manage_cap = wp_statistics_validate_capability( $WP_Statistics->get_option('manage_capability', 'manage_options') );
 		
 		if( current_user_can( $manage_cap ) ) {
-			array_unshift( $links, '<a href="' . admin_url( 'admin.php?page=wp-statistics/settings' ) . '">' . __( 'Settings', 'wp_statistics' ) . '</a>' );
+			array_unshift( $links, '<a href="' . admin_url( 'admin.php?page=' . WP_STATISTICS_SETTINGS_PAGE ) . '">' . __( 'Settings', 'wp_statistics' ) . '</a>' );
 		}
 		
 		return $links;
@@ -248,7 +342,7 @@ License: GPL2
 	// Render the custom column on the post/pages lists.
 	function wp_statistics_render_column( $column_name, $post_id ) {
 		if( $column_name == 'wp-statistics' ) {
-			echo "<a href='" . get_admin_url() . "admin.php?page=wps_pages_menu&page-id={$post_id}'>" . wp_statistics_pages( 'total', "", $post_id ) . "</a>";
+			echo "<a href='" . get_admin_url() . "admin.php?page=" . WP_STATISTICS_PAGES_PAGE . "&page-id={$post_id}'>" . wp_statistics_pages( 'total', "", $post_id ) . "</a>";
 		}
 	}
 	
@@ -256,9 +350,9 @@ License: GPL2
 	function wp_statistics_load_edit_init() {
 		GLOBAL $WP_Statistics;
 		
-		$manage_cap = wp_statistics_validate_capability( $WP_Statistics->get_option('manage_capability', 'manage_options') );
+		$read_cap = wp_statistics_validate_capability( $WP_Statistics->get_option('read_capability', 'manage_options') );
 		
-		if( current_user_can( $manage_cap ) && $WP_Statistics->get_option('pages') && !$WP_Statistics->get_option('disable_column') ) {
+		if( current_user_can( $read_cap ) && $WP_Statistics->get_option('pages') && !$WP_Statistics->get_option('disable_column') ) {
 			$post_types = (array)get_post_types( array( 'show_ui' => true ), 'object' );
 			
 			foreach( $post_types as $type ) {
@@ -275,7 +369,7 @@ License: GPL2
 		
 		$id = $post->ID;
 	
-		echo "<div class='misc-pub-section'>" . __( 'WP Statistics - Hits', 'wp_statistics') . ': <b>' . wp_statistics_pages( 'total', '', $id ) . '</b></div>';
+		echo "<div class='misc-pub-section'>" . __( 'WP Statistics - Hits', 'wp_statistics') . ": <b><a href='" . get_admin_url() . "admin.php?page=" . WP_STATISTICS_PAGES_PAGE . "&page-id={$id}'>" . wp_statistics_pages( 'total', "", $id ) . "</a></b></div>";
 	}
 	if( $WP_Statistics->get_option('pages') && !$WP_Statistics->get_option('disable_column') ) {
 		add_action( 'post_submitbox_misc_actions', 'wp_statistics_post_init' );
@@ -287,6 +381,8 @@ License: GPL2
 		global $wp_roles;
 
 		$role_list = $wp_roles->get_names();
+
+		if( !is_object( $wp_roles ) || !is_array( $wp_roles->roles) ) { return 'manage_options'; }
 
 		foreach( $wp_roles->roles as $role ) {
 		
@@ -309,34 +405,74 @@ License: GPL2
 		$manage_cap = wp_statistics_validate_capability( $WP_Statistics->get_option('manage_capability', 'manage_options') );
 		
 		// Add the top level menu.
-		add_menu_page(__('Statistics', 'wp_statistics'), __('Statistics', 'wp_statistics'), $read_cap, __FILE__, 'wp_statistics_log');
+		$WP_Statistics->menu_slugs['top'] = add_menu_page(__('Statistics', 'wp_statistics'), __('Statistics', 'wp_statistics'), $read_cap, WP_STATISTICS_OVERVIEW_PAGE, 'wp_statistics_log');
 		
 		// Add the sub items.
-		add_submenu_page(__FILE__, __('Overview', 'wp_statistics'), __('Overview', 'wp_statistics'), $read_cap, __FILE__, 'wp_statistics_log');
-		add_submenu_page(__FILE__, __('Browsers', 'wp_statistics'), __('Browsers', 'wp_statistics'), $read_cap, 'wps_browsers_menu', 'wp_statistics_log');
-		if( $WP_Statistics->get_option('geoip') ) {
-			add_submenu_page(__FILE__, __('Countries', 'wp_statistics'), __('Countries', 'wp_statistics'), $read_cap, 'wps_countries_menu', 'wp_statistics_log');
-		}
-		add_submenu_page(__FILE__, __('Exclusions', 'wp_statistics'), __('Exclusions', 'wp_statistics'), $read_cap, 'wps_exclusions_menu', 'wp_statistics_log');
-		add_submenu_page(__FILE__, __('Hits', 'wp_statistics'), __('Hits', 'wp_statistics'), $read_cap, 'wps_hits_menu', 'wp_statistics_log');
-		add_submenu_page(__FILE__, __('Online', 'wp_statistics'), __('Online', 'wp_statistics'), $read_cap, 'wps_online_menu', 'wp_statistics_log');
-		add_submenu_page(__FILE__, __('Pages', 'wp_statistics'), __('Pages', 'wp_statistics'), $read_cap, 'wps_pages_menu', 'wp_statistics_log');
-		add_submenu_page(__FILE__, __('Referrers', 'wp_statistics'), __('Referrers', 'wp_statistics'), $read_cap, 'wps_referrers_menu', 'wp_statistics_log');
-		add_submenu_page(__FILE__, __('Searches', 'wp_statistics'), __('Searches', 'wp_statistics'), $read_cap, 'wps_searches_menu', 'wp_statistics_log');
-		add_submenu_page(__FILE__, __('Search Words', 'wp_statistics'), __('Search Words', 'wp_statistics'), $read_cap, 'wps_words_menu', 'wp_statistics_log');
-		add_submenu_page(__FILE__, __('Top Visitors Today', 'wp_statistics'), __('Top Visitors Today', 'wp_statistics'), $read_cap, 'wps_top_visitors_menu', 'wp_statistics_log');
-		add_submenu_page(__FILE__, __('Visitors', 'wp_statistics'), __('Visitors', 'wp_statistics'), $read_cap, 'wps_visitors_menu', 'wp_statistics_log');
-		add_submenu_page(__FILE__, '', '', $read_cap, 'wps_break_menu', 'wp_statistics_log');
-		add_submenu_page(__FILE__, __('Optimization', 'wp_statistics'), __('Optimization', 'wp_statistics'), $manage_cap, 'wp-statistics/optimization', 'wp_statistics_optimization');
-		add_submenu_page(__FILE__, __('Settings', 'wp_statistics'), __('Settings', 'wp_statistics'), $read_cap, 'wp-statistics/settings', 'wp_statistics_settings');
+		$WP_Statistics->menu_slugs['overview'] = add_submenu_page(WP_STATISTICS_OVERVIEW_PAGE, __('Overview', 'wp_statistics'), __('Overview', 'wp_statistics'), $read_cap, WP_STATISTICS_OVERVIEW_PAGE, 'wp_statistics_log');
+		
+		if( $WP_Statistics->get_option('visitors') ) { $WP_Statistics->menu_slugs['browsers'] = add_submenu_page(WP_STATISTICS_OVERVIEW_PAGE, __('Browsers', 'wp_statistics'), __('Browsers', 'wp_statistics'), $read_cap, WP_STATISTICS_BROWSERS_PAGE, 'wp_statistics_log'); }
+		if( $WP_Statistics->get_option('geoip') && $WP_Statistics->get_option('visitors') ) { $WP_Statistics->menu_slugs['countries'] = add_submenu_page(WP_STATISTICS_OVERVIEW_PAGE, __('Countries', 'wp_statistics'), __('Countries', 'wp_statistics'), $read_cap, WP_STATISTICS_COUNTRIES_PAGE, 'wp_statistics_log'); }
+		if( $WP_Statistics->get_option('record_exclusions') ) { $WP_Statistics->menu_slugs['exclusions'] = add_submenu_page(WP_STATISTICS_OVERVIEW_PAGE, __('Exclusions', 'wp_statistics'), __('Exclusions', 'wp_statistics'), $read_cap, WP_STATISTICS_EXCLUSIONS_PAGE, 'wp_statistics_log'); }
+		if( $WP_Statistics->get_option('visits') ) { $WP_Statistics->menu_slugs['hits'] = add_submenu_page(WP_STATISTICS_OVERVIEW_PAGE, __('Hits', 'wp_statistics'), __('Hits', 'wp_statistics'), $read_cap, WP_STATISTICS_HITS_PAGE, 'wp_statistics_log'); }
+		if( $WP_Statistics->get_option('useronline') ) { $WP_Statistics->menu_slugs['online'] = add_submenu_page(WP_STATISTICS_OVERVIEW_PAGE, __('Online', 'wp_statistics'), __('Online', 'wp_statistics'), $read_cap, WP_STATISTICS_ONLINE_PAGE, 'wp_statistics_log'); }
+		if( $WP_Statistics->get_option('pages') ) { $WP_Statistics->menu_slugs['pages'] = add_submenu_page(WP_STATISTICS_OVERVIEW_PAGE, __('Pages', 'wp_statistics'), __('Pages', 'wp_statistics'), $read_cap, WP_STATISTICS_PAGES_PAGE, 'wp_statistics_log'); }
+		if( $WP_Statistics->get_option('visitors') ) { $WP_Statistics->menu_slugs['referrers'] = add_submenu_page(WP_STATISTICS_OVERVIEW_PAGE, __('Referrers', 'wp_statistics'), __('Referrers', 'wp_statistics'), $read_cap, WP_STATISTICS_REFERRERS_PAGE, 'wp_statistics_log'); }
+		if( $WP_Statistics->get_option('visitors') ) { $WP_Statistics->menu_slugs['searches'] = add_submenu_page(WP_STATISTICS_OVERVIEW_PAGE, __('Searches', 'wp_statistics'), __('Searches', 'wp_statistics'), $read_cap, WP_STATISTICS_SEARCHES_PAGE, 'wp_statistics_log'); }
+		if( $WP_Statistics->get_option('visitors') ) { $WP_Statistics->menu_slugs['words'] = add_submenu_page(WP_STATISTICS_OVERVIEW_PAGE, __('Search Words', 'wp_statistics'), __('Search Words', 'wp_statistics'), $read_cap, WP_STATISTICS_WORDS_PAGE, 'wp_statistics_log'); }
+		if( $WP_Statistics->get_option('visitors') ) { $WP_Statistics->menu_slugs['top.visotors'] = add_submenu_page(WP_STATISTICS_OVERVIEW_PAGE, __('Top Visitors Today', 'wp_statistics'), __('Top Visitors Today', 'wp_statistics'), $read_cap, WP_STATISTICS_TOP_VISITORS_PAGE, 'wp_statistics_log'); }
+		if( $WP_Statistics->get_option('visitors') ) { $WP_Statistics->menu_slugs['visitors'] = add_submenu_page(WP_STATISTICS_OVERVIEW_PAGE, __('Visitors', 'wp_statistics'), __('Visitors', 'wp_statistics'), $read_cap, WP_STATISTICS_VISITORS_PAGE, 'wp_statistics_log'); }
+
+		$WP_Statistics->menu_slugs['break'] = add_submenu_page(WP_STATISTICS_OVERVIEW_PAGE, '', '', $read_cap, 'wps_break_menu', 'wp_statistics_log');
+
+		$WP_Statistics->menu_slugs['optimize'] = add_submenu_page(WP_STATISTICS_OVERVIEW_PAGE, __('Optimization', 'wp_statistics'), __('Optimization', 'wp_statistics'), $manage_cap, WP_STATISTICS_OPTIMIZATION_PAGE, 'wp_statistics_optimization');
+		$WP_Statistics->menu_slugs['settings'] = add_submenu_page(WP_STATISTICS_OVERVIEW_PAGE, __('Settings', 'wp_statistics'), __('Settings', 'wp_statistics'), $read_cap, WP_STATISTICS_SETTINGS_PAGE, 'wp_statistics_settings');
+		$WP_Statistics->menu_slugs['donate'] = add_submenu_page(WP_STATISTICS_OVERVIEW_PAGE, __('Donate', 'wp_statistics'), __('Donate', 'wp_statistics'), $read_cap, WP_STATISTICS_DONATE_PAGE, 'wp_statistics_donate');
 		
 		// Only add the manual entry if it hasn't been deleted.
 		if( $WP_Statistics->get_option('delete_manual') != true ) {
-			add_submenu_page(__FILE__, __('Manual', 'wp_statistics'), __('Manual', 'wp_statistics'), $manage_cap, 'wps_manual_menu', 'wp_statistics_manual');
+			$WP_Statistics->menu_slugs['manual'] = add_submenu_page(WP_STATISTICS_OVERVIEW_PAGE, __('Manual', 'wp_statistics'), __('Manual', 'wp_statistics'), $manage_cap, WP_STATISTICS_MANUAL_PAGE, 'wp_statistics_manual');
 		}
+
+		// Add action to load the meta boxes to the overview page.
+		add_action('load-' . $WP_Statistics->menu_slugs['overview'], 'wp_statistics_load_overview_page');
 	}
 	add_action('admin_menu', 'wp_statistics_menu');
 
+	function wp_statistics_load_overview_page() {
+		GLOBAL $WP_Statistics;
+
+		// Right side "wide" widgets
+		if( $WP_Statistics->get_option('visits') ) { 
+			add_meta_box( 'wps_hits_postbox', __( 'Hit Statistics', 'wp_statistics' ), 'wp_statistics_generate_overview_postbox_contents', $WP_Statistics->menu_slugs['overview'], 'normal', null, array( 'widget' => 'hits' ) );
+		}
+		
+		if( $WP_Statistics->get_option('visitors') ) { 
+			add_meta_box( 'wps_top_visitors_postbox', __( 'Top Visitors', 'wp_statistics' ), 'wp_statistics_generate_overview_postbox_contents', $WP_Statistics->menu_slugs['overview'], 'normal', null, array( 'widget' => 'top.visitors' ) );
+			add_meta_box( 'wps_search_postbox', __( 'Search Engine Referrals', 'wp_statistics' ), 'wp_statistics_generate_overview_postbox_contents', $WP_Statistics->menu_slugs['overview'], 'normal', null, array( 'widget' => 'search' ) );
+			add_meta_box( 'wps_words_postbox', __( 'Latest Search Words', 'wp_statistics' ), 'wp_statistics_generate_overview_postbox_contents', $WP_Statistics->menu_slugs['overview'], 'normal', null, array( 'widget' => 'words' ) );
+			add_meta_box( 'wps_recent_postbox', __( 'Recent Visitors', 'wp_statistics' ), 'wp_statistics_generate_overview_postbox_contents', $WP_Statistics->menu_slugs['overview'], 'normal', null, array( 'widget' => 'recent' ) );
+
+			if( $WP_Statistics->get_option('geoip') ) { 
+				add_meta_box( 'wps_map_postbox', __( 'Today Visitors Map', 'wp_statistics' ), 'wp_statistics_generate_overview_postbox_contents', $WP_Statistics->menu_slugs['overview'], 'normal', null, array( 'widget' => 'map' ) );
+			}
+		}
+		
+		if( $WP_Statistics->get_option('pages') ) { 
+			add_meta_box( 'wps_pages_postbox', __( 'Top 10 Pages', 'wp_statistics' ), 'wp_statistics_generate_overview_postbox_contents', $WP_Statistics->menu_slugs['overview'], 'normal', null, array( 'widget' => 'pages' ) );
+		}
+		
+		// Left side "thin" widgets.
+		if( $WP_Statistics->get_option('visitors') ) { 
+			add_meta_box( 'wps_summary_postbox', __( 'Summary', 'wp_statistics'), 'wp_statistics_generate_overview_postbox_contents', $WP_Statistics->menu_slugs['overview'], 'side', null, array( 'widget' => 'summary' ) );
+			add_meta_box( 'wps_browsers_postbox', __( 'Browsers', 'wp_statistics'), 'wp_statistics_generate_overview_postbox_contents', $WP_Statistics->menu_slugs['overview'], 'side', null, array( 'widget' => 'browsers' ) );
+			add_meta_box( 'wps_referring_postbox', __( 'Top Referring Sites', 'wp_statistics'), 'wp_statistics_generate_overview_postbox_contents', $WP_Statistics->menu_slugs['overview'], 'side', null, array( 'widget' => 'referring' ) );
+		
+			if( $WP_Statistics->get_option('geoip') ) { 
+				add_meta_box( 'wps_countries_postbox', __( 'Top 10 Countries', 'wp_statistics'), 'wp_statistics_generate_overview_postbox_contents', $WP_Statistics->menu_slugs['overview'], 'side', null, array( 'widget' => 'countries' ) );
+			}
+		}
+	}
+	
 	// This function adds the primary menu to WordPress network.
 	function wp_statistics_networkmenu() {
 		GLOBAL $WP_Statistics;
@@ -363,7 +499,7 @@ License: GPL2
 		// Only add the manual entry if it hasn't been deleted.
 		if( $WP_Statistics->get_option('delete_manual') != true ) {
 			add_submenu_page(__FILE__, '', '', $read_cap, 'wps_break_menu', 'wp_statistics_log_overview');
-			add_submenu_page(__FILE__, __('Manual', 'wp_statistics'), __('Manual', 'wp_statistics'), $manage_cap, 'wps_manual_menu', 'wp_statistics_manual');
+			add_submenu_page(__FILE__, __('Manual', 'wp_statistics'), __('Manual', 'wp_statistics'), $manage_cap, WP_STATISTICS_MANUAL_PAGE, 'wp_statistics_manual');
 		}
 	}
 
@@ -387,20 +523,20 @@ License: GPL2
 <?php
 		$i = 0;
 		
-		$options = array( 	__('Overview', 'wp_statistics') => 'wp-statistics/wp-statistics.php', 
-							__('Browsers', 'wp_statistics') => 'wps_browsers_menu', 
-							__('Countries', 'wp_statistics') => 'wps_countries_menu', 
-							__('Exclusions', 'wp_statistics') => 'wps_exclusions_menu', 
-							__('Hits', 'wp_statistics') => 'wps_hits_menu', 
-							__('Online', 'wp_statistics') => 'wps_online_menu', 
-							__('Pages', 'wp_statistics') => 'wps_pages_menu', 
-							__('Referrers', 'wp_statistics') => 'wps_referrers_menu', 
-							__('Searches', 'wp_statistics') => 'wps_searches_menu', 
-							__('Search Words', 'wp_statistics') => 'wps_words_menu', 
-							__('Top Visitors Today', 'wp_statistics') => 'wps_top_visitors_menu', 
-							__('Visitors', 'wp_statistics') => 'wps_visitors_menu', 
-							__('Optimization', 'wp_statistics') => 'wp-statistics/optimization', 
-							__('Settings', 'wp_statistics') => 'wp-statistics/settings'
+		$options = array( 	__('Overview', 'wp_statistics') => WP_STATISTICS_OVERVIEW_PAGE, 
+							__('Browsers', 'wp_statistics') => WP_STATISTICS_BROWSERS_PAGE, 
+							__('Countries', 'wp_statistics') => WP_STATISTICS_COUNTRIES_PAGE, 
+							__('Exclusions', 'wp_statistics') => WP_STATISTICS_EXCLUSIONS_PAGE, 
+							__('Hits', 'wp_statistics') => WP_STATISTICS_HITS_PAGE, 
+							__('Online', 'wp_statistics') => WP_STATISTICS_ONLINE_PAGE, 
+							__('Pages', 'wp_statistics') => WP_STATISTICS_PAGES_PAGE, 
+							__('Referrers', 'wp_statistics') => WP_STATISTICS_REFERRERS_PAGE, 
+							__('Searches', 'wp_statistics') => WP_STATISTICS_SEARCHES_PAGE, 
+							__('Search Words', 'wp_statistics') => WP_STATISTICS_WORDS_PAGE, 
+							__('Top Visitors Today', 'wp_statistics') => WP_STATISTICS_TOP_VISITORS_PAGE, 
+							__('Visitors', 'wp_statistics') => WP_STATISTICS_VISITORS_PAGE, 
+							__('Optimization', 'wp_statistics') => WP_STATISTICS_OPTIMIZATION_PAGE, 
+							__('Settings', 'wp_statistics') => WP_STATISTICS_SETTINGS_PAGE
 						);
 						
 		foreach( wp_get_sites() as $blog ) {
@@ -445,11 +581,17 @@ License: GPL2
 		$details = get_blog_details( $blog_id );
 
 		// Get the admin url for the current site.
-		$url = get_admin_url($blog_id) . "/admin.php?page=wp-statistics/wp-statistics.php";
+		$url = get_admin_url($blog_id) . "/admin.php?page=" . WP_STATISTICS_OVERVIEW_PAGE;
 
 		echo "<script>window.location.href = '$url';</script>";
 	}
 	
+	function wp_statistics_donate() {
+		$url = get_admin_url() . "/admin.php?page=" . WP_STATISTICS_SETTINGS_PAGE . "&tab=about";
+
+		echo "<script>window.open('http://wp-statistics.com/donate','_blank'); window.location.href = '$url';</script>";
+	}
+
 	// This function adds the menu icon to the top level menu.  WordPress 3.8 changed the style of the menu a bit and so a different css file is loaded.
 	function wp_statistics_menu_icon() {
 	
@@ -465,10 +607,13 @@ License: GPL2
 	
 	// This function adds the admin bar menu if the user has selected it.
 	function wp_statistics_menubar() {
-	
-		global $wp_admin_bar, $wp_version;
+		GLOBAL $wp_admin_bar, $wp_version, $WP_Statistics;
+
+		// Find out if the user can read or manage statistics.
+		$read = current_user_can( wp_statistics_validate_capability( $WP_Statistics->get_option('read_capability', 'manage_options') ) );
+		$manage = current_user_can( wp_statistics_validate_capability( $WP_Statistics->get_option('manage_capability', 'manage_options') ) );
 		
-		if ( is_super_admin() || is_admin_bar_showing() ) {
+		if( is_admin_bar_showing() && ( $read || $manage ) ) {
 
 			$AdminURL = get_admin_url();
 		
@@ -476,13 +621,13 @@ License: GPL2
 				$wp_admin_bar->add_menu( array(
 					'id'		=>	'wp-statistic-menu',
 					'title'		=>	'<span class="ab-icon"></span>',
-					'href'		=>	$AdminURL . 'admin.php?page=wp-statistics/wp-statistics.php'
+					'href'		=>	$AdminURL . 'admin.php?page=' . WP_STATISTICS_OVERVIEW_PAGE
 				));
 			} else {
 				$wp_admin_bar->add_menu( array(
 					'id'		=>	'wp-statistic-menu',
 					'title'		=>	'<img src="'.plugin_dir_url(__FILE__).'/assets/images/icon.png"/>',
-					'href'		=>	$AdminURL . 'admin.php?page=wp-statistics/wp-statistics.php'
+					'href'		=>	$AdminURL . 'admin.php?page=' . WP_STATISTICS_OVERVIEW_PAGE
 				));
 			}
 			
@@ -490,7 +635,7 @@ License: GPL2
 				'id'		=> 	'wp-statistics-menu-useronline',
 				'parent'	=>	'wp-statistic-menu',
 				'title'		=>	__('User Online', 'wp_statistics') . ": " . wp_statistics_useronline(),
-				'href'		=>  $AdminURL . 'admin.php?page=wps_online_menu'
+				'href'		=>  $AdminURL . 'admin.php?page=' . WP_STATISTICS_ONLINE_PAGE
 			));
 			
 			$wp_admin_bar->add_menu( array(
@@ -521,7 +666,7 @@ License: GPL2
 				'id'		=> 	'wp-statistics-menu-viewstats',
 				'parent'	=>	'wp-statistic-menu',
 				'title'		=>	__('View Stats', 'wp_statistics'),
-				'href'		=>	$AdminURL . 'admin.php?page=wp-statistics/wp-statistics.php'
+				'href'		=>	$AdminURL . 'admin.php?page=' . WP_STATISTICS_OVERVIEW_PAGE
 			));
 		}
 	}
@@ -544,8 +689,8 @@ License: GPL2
 			echo '</script>' . "\n";
 
 			echo '<br>';
-			echo '<a href="' .  plugin_dir_url(__FILE__) . 'manual/manual.php?type=odt' . '" target="_blank"><img src="' . plugin_dir_url(__FILE__) . 'assets/images/ODT.png' . '" height="32" width="32" alt="' . __('Download ODF file', 'wp_statistics') . '"></a>&nbsp;';
-			echo '<a href="' .  plugin_dir_url(__FILE__) . 'manual/manual.php?type=html' . '" target="_blank"><img src="' . plugin_dir_url(__FILE__) . 'assets/images/HTML.png' . '" height="32" width="32" alt="' . __('Download HTML file', 'wp_statistics') . '"></a><br>';
+			echo '<a href="admin.php?page=' . WP_STATISTICS_MANUAL_PAGE . '&wps_download_manual=true&type=odt' . '" target="_blank"><img src="' . plugin_dir_url(__FILE__) . 'assets/images/ODT.png' . '" height="32" width="32" alt="' . __('Download ODF file', 'wp_statistics') . '"></a>&nbsp;';
+			echo '<a href="admin.php?page=' . WP_STATISTICS_MANUAL_PAGE . '&wps_download_manual=true&type=html' . '" target="_blank"><img src="' . plugin_dir_url(__FILE__) . 'assets/images/HTML.png' . '" height="32" width="32" alt="' . __('Download HTML file', 'wp_statistics') . '"></a><br>';
 			
 			echo '<iframe src="' .  plugin_dir_url(__FILE__) . WP_STATISTICS_MANUAL . 'html' . '" width="100%" frameborder="0" scrolling="no" id="wps_inline_docs" onload="AdjustiFrameHeight(\'wps_inline_docs\', 50);"></iframe>';
 		} else {
@@ -558,47 +703,47 @@ License: GPL2
 		GLOBAL $wpdb, $WP_Statistics, $plugin_page;
 
 		switch( $plugin_page ) {
-			case 'wps_browsers_menu':
+			case WP_STATISTICS_BROWSERS_PAGE:
 				$log_type = 'all-browsers';
 
 				break;
-			case 'wps_countries_menu':
+			case WP_STATISTICS_COUNTRIES_PAGE:
 				$log_type = 'top-countries';
 
 				break;
-			case 'wps_exclusions_menu':
+			case WP_STATISTICS_EXCLUSIONS_PAGE:
 				$log_type = 'exclusions';
 
 				break;
-			case 'wps_hits_menu':
+			case WP_STATISTICS_HITS_PAGE:
 				$log_type = 'hit-statistics';
 
 				break;
-			case 'wps_online_menu':
+			case WP_STATISTICS_ONLINE_PAGE:
 				$log_type = 'online';
 
 				break;
-			case 'wps_pages_menu':
+			case WP_STATISTICS_PAGES_PAGE:
 				$log_type = 'top-pages';
 
 				break;
-			case 'wps_referrers_menu':
+			case WP_STATISTICS_REFERRERS_PAGE:
 				$log_type = 'top-referring-site';
 
 				break;
-			case 'wps_searches_menu':
+			case WP_STATISTICS_SEARCHES_PAGE:
 				$log_type = 'search-statistics';
 
 				break;
-			case 'wps_words_menu':
+			case WP_STATISTICS_WORDS_PAGE:
 				$log_type = 'last-all-search';
 
 				break;
-			case 'wps_top_visitors_menu':
+			case WP_STATISTICS_TOP_VISITORS_PAGE:
 				$log_type = 'top-visitors';
 
 				break;
-			case 'wps_visitors_menu':
+			case WP_STATISTICS_VISITORS_PAGE:
 				$log_type = 'last-all-visitor';
 
 				break;
@@ -620,19 +765,35 @@ License: GPL2
 		}
 		
 		// We want to make sure the tables actually exist before we blindly start access them.
-		$result['useronline'] = $wpdb->query("CHECK TABLE `{$wpdb->prefix}statistics_useronline`");
-		$result['visit'] = $wpdb->query("CHECK TABLE `{$wpdb->prefix}statistics_visit`");
-		$result['visitor'] = $wpdb->query("CHECK TABLE `{$wpdb->prefix}statistics_visitor`");
-		$result['exclusions'] = $wpdb->query("CHECK TABLE `{$wpdb->prefix}statistics_exclusions`");
-		$result['pages'] = $wpdb->query("CHECK TABLE `{$wpdb->prefix}statistics_pages`");
-		$result['historical'] = $wpdb->query("CHECK TABLE `{$wpdb->prefix}statistics_historical`");
-		
-		if( ($result['useronline']) && ($result['visit']) && ($result['visitor']) != '1' && ($result['exclusions']) != '1' && ($result['pages']) != '1' ) {
-			$get_bloginfo_url = get_admin_url() . "admin.php?page=wp-statistics/optimization&tab=database";
-			wp_die('<div class="error"><p>' . sprintf(__('Plugin tables do not exist in the database! Please re-run the %s install routine %s.', 'wp_statistics'),'<a href="' . $get_bloginfo_url . '">','</a>') . '</p></div>');
+		$dbname = DB_NAME;
+		$result = $wpdb->query("SHOW TABLES WHERE `Tables_in_{$dbname}` = '{$wpdb->prefix}statistics_visitor' OR `Tables_in_{$dbname}` = '{$wpdb->prefix}statistics_visit' OR `Tables_in_{$dbname}` = '{$wpdb->prefix}statistics_exclusions' OR `Tables_in_{$dbname}` = '{$wpdb->prefix}statistics_historical' OR `Tables_in_{$dbname}` = '{$wpdb->prefix}statistics_pages' OR `Tables_in_{$dbname}` = '{$wpdb->prefix}statistics_useronline' OR `Tables_in_{$dbname}` = '{$wpdb->prefix}statistics_search'" );
+	
+		if( $result != 7 ) {
+			$get_bloginfo_url = get_admin_url() . "admin.php?page=" . WP_STATISTICS_OPTIMIZATION_PAGE . "&tab=database";
+
+			$missing_tables = array();
+			
+			$result = $wpdb->query("SHOW TABLES WHERE `Tables_in_{$dbname}` = '{$wpdb->prefix}statistics_visitor'" );
+			if( $result != 1 ) { $missing_tables[] = $wpdb->prefix . 'statistics_visitor'; }
+			$result = $wpdb->query("SHOW TABLES WHERE `Tables_in_{$dbname}` = '{$wpdb->prefix}statistics_visit'" );
+			if( $result != 1 ) { $missing_tables[] = $wpdb->prefix . 'statistics_visit'; }
+			$result = $wpdb->query("SHOW TABLES WHERE `Tables_in_{$dbname}` = '{$wpdb->prefix}statistics_exclusions'" );
+			if( $result != 1 ) { $missing_tables[] = $wpdb->prefix . 'statistics_exclusions'; }
+			$result = $wpdb->query("SHOW TABLES WHERE `Tables_in_{$dbname}` = '{$wpdb->prefix}statistics_historical'" );
+			if( $result != 1 ) { $missing_tables[] = $wpdb->prefix . 'statistics_historical'; }
+			$result = $wpdb->query("SHOW TABLES WHERE `Tables_in_{$dbname}` = '{$wpdb->prefix}statistics_useronline'" );
+			if( $result != 1 ) { $missing_tables[] = $wpdb->prefix . 'statistics_useronline'; }
+			$result = $wpdb->query("SHOW TABLES WHERE `Tables_in_{$dbname}` = '{$wpdb->prefix}statistics_pages'" );
+			if( $result != 1 ) { $missing_tables[] = $wpdb->prefix . 'statistics_pages'; }
+			$result = $wpdb->query("SHOW TABLES WHERE `Tables_in_{$dbname}` = '{$wpdb->prefix}statistics_search'" );
+			if( $result != 1 ) { $missing_tables[] = $wpdb->prefix . 'statistics_search'; }
+
+			wp_die('<div class="error"><p>' . sprintf(__('The following plugin table(s) do not exist in the database, please re-run the %s install routine %s: ', 'wp_statistics'),'<a href="' . $get_bloginfo_url . '">','</a>') . implode(', ', $missing_tables) . '</p></div>');
 		}
 		
 		// Load the postbox script that provides the widget style boxes.
+		wp_enqueue_script('common');
+		wp_enqueue_script('wp-lists');
 		wp_enqueue_script('postbox');
 		
 		// Load the css we use for the statistics pages.
@@ -714,8 +875,13 @@ License: GPL2
 				wp_enqueue_style('jqvmap-css', plugin_dir_url(__FILE__) . 'assets/jqvmap/jqvmap.css', true, '1.1');
 				wp_enqueue_script('jquery-vmap', plugin_dir_url(__FILE__) . 'assets/jqvmap/jquery.vmap.min.js', true, '1.1');
 				wp_enqueue_script('jquery-vmap-world', plugin_dir_url(__FILE__) . 'assets/jqvmap/maps/jquery.vmap.world.js', true, '1.1');
+			} else {
+				wp_enqueue_script('google-maps', 'https://maps.google.com/maps/api/js');	
 			}
 		
+			// Load our custom widgets handling javascript.
+			wp_enqueue_script('wp_statistics_log', plugin_dir_url(__FILE__) . 'assets/js/log.js');
+			
 			include_once dirname( __FILE__ ) . '/includes/log/log.php';
 		}
 	}
@@ -751,6 +917,7 @@ License: GPL2
 		$result['exclusions'] = $wpdb->get_var("SELECT COUNT(ID) FROM `{$wpdb->prefix}statistics_exclusions`");
 		$result['pages'] = $wpdb->get_var("SELECT COUNT(uri) FROM `{$wpdb->prefix}statistics_pages`");
 		$result['historical'] = $wpdb->get_Var("SELECT COUNT(ID) FROM `{$wpdb->prefix}statistics_historical`");
+		$result['search'] = $wpdb->get_Var("SELECT COUNT(ID) FROM `{$wpdb->prefix}statistics_search`");
 		
 		include_once dirname( __FILE__ ) . "/includes/optimization/wps-optimization.php";
 	}
