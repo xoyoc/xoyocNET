@@ -3,8 +3,8 @@
 RewriteEngine On
 RewriteBase /
 AddDefaultCharset UTF-8
-RewriteCond %{HTTP_HOST} ^www.ceedi.edu.mx [NC]
-RewriteRule ^(.*)$ http\:\/\/ceedi\.edu\.mx\/$1 [R=301,L]
+RewriteCond %{HTTP_HOST} ^www.xoyoc.net [NC]
+RewriteRule ^(.*)$ http\:\/\/xoyoc\.net\/$1 [R=301,L]
 RewriteCond %{REQUEST_METHOD} !POST
 RewriteCond %{QUERY_STRING} !.*=.*
 RewriteCond %{HTTP:X-Wap-Profile} !^[a-z0-9\"]+ [NC]
@@ -49,5 +49,9 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.php [L]
 </IfModule>
+#set max upload file size
+php_value upload_max_filesize 10M
+#set max post size
+php_value post_max_size 10M
 
 # END WordPress
