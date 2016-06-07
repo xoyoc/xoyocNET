@@ -1,4 +1,8 @@
 # BEGIN WpFastestCache
+#tamaño máximo para la carga de archivos
+php_value upload_max_filesize 32M
+#Establece el tamaño maximo de las entradas
+php_value post_max_size 32M
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteBase /
@@ -49,8 +53,4 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.php [L]
 </IfModule>
-#tamaño máximo para la carga de archivos
-php_value upload_max_filesize 32M
-#Establece el tamaño maximo de las entradas
-php_value post_max_size 32M
 # END WordPress
