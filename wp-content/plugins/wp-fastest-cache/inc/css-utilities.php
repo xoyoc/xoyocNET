@@ -13,6 +13,23 @@
 			$this->tags_reorder();
 		}
 
+		public function check_exclude($css_url = false){
+			if($css_url){
+				foreach((array)$this->wpfc->exclude_rules as $key => $value){
+
+					if(isset($value->prefix) && $value->prefix && $value->type == "css"){
+						if($value->prefix == "contain"){
+							$preg_match_rule = preg_quote($value->content, "/");
+						}
+
+						if(preg_match("/".$preg_match_rule."/i", $css_url)){
+							return true;
+						}
+					}
+				}
+			}
+		}
+
 		public function combineCss(){
 			$all = array();
 			$group = array();
@@ -29,6 +46,12 @@
 					}
 
 					if(!$this->checkInternal($value["text"])){
+						array_push($all, $group);
+						$group = array();
+						continue;
+					}
+
+					if($this->check_exclude($value["text"])){
 						array_push($all, $group);
 						$group = array();
 						continue;
@@ -74,10 +97,10 @@
 						$cachFilePath = WPFC_WP_CONTENT_DIR."/cache/wpfc-minified/".$combined_name;
 						$cssLink = str_replace(array("http:", "https:"), "", content_url())."/cache/wpfc-minified/".$combined_name;
 
+						$GLOBALS["wp_fastest_cache"]->images_in_css["name"] = $GLOBALS["wp_fastest_cache"]->images_in_css["name"].$cachFilePath;
+
 						if(is_dir($cachFilePath)){
 							if($cssFiles = @scandir($cachFilePath, 1)){
-
-								$this->set_images_in_css(false);
 
 								$combined_link = '<link rel="stylesheet" type="text/css" href="'.$cssLink."/".$cssFiles[0].'" media="'.$group_value[0]["media"].'"/>';
 							}
@@ -91,7 +114,7 @@
 									$combined_css = preg_replace_callback("/(url)\(([^\)]+)\)/i", array($this->wpfc, 'cdn_replace_urls'), $combined_css);
 								}
 
-								$this->set_images_in_css($combined_css);
+								$GLOBALS["wp_fastest_cache"]->set_images_in_css($combined_css);
 
 								$this->wpfc->createFolder($cachFilePath, $combined_css, "css", time(), true);
 								
@@ -154,17 +177,24 @@
 
 					if(preg_match("/<link/i", $text)){
 						if($href = $this->checkInternal($text)){
+							if($this->check_exclude($href)){
+								continue;
+							}
 
 							$minifiedCss = $this->minify($href);
 
 							if($minifiedCss){
-								$this->set_images_in_css($minifiedCss["cssContent"]);
+								$GLOBALS["wp_fastest_cache"]->set_images_in_css($minifiedCss["cssContent"]);
 
 								$prefixLink = str_replace(array("http:", "https:"), "", $minifiedCss["url"]);
 								$text = preg_replace("/href\=[\"\'][^\"\']+[\"\']/", "href='".$prefixLink."'", $text);
 
 								$this->html = substr_replace($this->html, $text, $value["start"], ($value["end"] - $value["start"] + 1));
+
+								$GLOBALS["wp_fastest_cache"]->images_in_css["name"] = $GLOBALS["wp_fastest_cache"]->images_in_css["name"].md5($minifiedCss["url"]);
 							}
+
+
 						}
 					}
 				}
@@ -285,11 +315,11 @@
 
 					$original_content_length = strlen($cssContent);
 
-					$cssContent = $this->fixPathsInCssContent($cssContent, $url);
-
 					if(isset($this->wpfc->options->wpFastestCacheMinifyCss) && $this->wpfc->options->wpFastestCacheMinifyCss){
 						$cssContent = $this->_process($cssContent);
 					}
+
+					$cssContent = $this->fixPathsInCssContent($cssContent, $url);
 
 					if(isset($this->wpfc->options->wpFastestCacheMinifyCssPowerFul) && $this->wpfc->options->wpFastestCacheMinifyCssPowerFul){
 						if(class_exists("WpFastestCachePowerfulHtml")){
@@ -297,6 +327,7 @@
 							$cssContent = $powerful_html->minify_css($cssContent);
 						}
 					}
+
 
 					$cssContent = str_replace("\xEF\xBB\xBF", '', $cssContent);
 
@@ -327,7 +358,7 @@
 			$this->url_for_fix = $url;
 
 			$css = preg_replace("/@import\s+[\"\']([^\;\"\'\)]+)[\"\'];/", "@import url($1);", $css);
-			$css = preg_replace_callback("/url\(([^\)]*)\)/", array($this, 'newImgPath'), $css);
+			$css = preg_replace_callback("/url\(([^\)\n]*)\)/", array($this, 'newImgPath'), $css);
 			$css = preg_replace_callback('/@import\s+url\(([^\)]+)\);/i', array($this, 'fix_import_rules'), $css);
 			$css = $this->fix_charset($css);
 
@@ -398,19 +429,6 @@
 			}
 
 			return $matches[0];
-		}
-
-		public function set_images_in_css($css_content = false){
-			if($css_content){
-				preg_match_all("/url\(([^\)]*)\)/i", $css_content, $out);
-
-				if(isset($out) && isset($out[1]) && isset($out[1][0])){
-					$GLOBALS["wp_fastest_cache"]->images_in_css["images"] = array_merge($GLOBALS["wp_fastest_cache"]->images_in_css["images"], array_unique($out[1]));
-					$GLOBALS["wp_fastest_cache"]->images_in_css["images"] = array_unique($GLOBALS["wp_fastest_cache"]->images_in_css["images"]);
-				}
-			}
-
-			$GLOBALS["wp_fastest_cache"]->images_in_css["path"] = $this->wpfc->cacheFilePath;
 		}
 
 		protected $_inHack = false;

@@ -1,11 +1,10 @@
 === WP Fastest Cache ===
 Contributors: emrevona
 Donate link: http://profiles.wordpress.org/emrevona/
-Tags: cache, caching, performance, wp-cache, super cache, total cache, quick cache, wordpress cache, wp cache, wordpress caching, nginx cache, browser cache, page cache, advanced cache, disk cache, fastest cache, cache plugin, wordpress cache plugin, Mod_Rewrite Cache, wp super cache, minify css cache, minify js cache, minify css, minify js, combine css, combine css cache, combine js, combine js cache, minify html cache, nginx, optimize, minify, cdn, woocommerce, plugin, post, posts, google, ajax, comments, seo, gzip, gzip compression, gzip cache, google page speed, ylow, speed, pagespeed
-
+Tags: cache, performance, wp-cache, total cache, super cache
 Requires at least: 3.3
-Tested up to: 4.5
-Stable tag: 4.5
+Tested up to: 4.6
+Stable tag: 4.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,6 +41,7 @@ Wpfc does not support Wordpress Multisite yet.
 10. SSL support
 11. CDN support
 12. Preload Cache - Create the cache of all the site automatically
+13. Exclude pages and user-agents
 
 <h4>Performance Optimization</h4>
 
@@ -81,17 +81,52 @@ Wpfc does not support Wordpress Multisite yet.
 == Screenshots ==
 
 1. Performance Comparison
-2. Without Cache
-3. With Cache
-4. Main Page
-5. Delete All File Page
-6. All cached files are deleted at the determinated time
-7. Block caching for post and pages (TinyMCE)
-8. Clean cached files via admin toolbar easily
-9. Exclude page
-10. CDN
+2. Other Performance Comparison
+3. Without Cache
+4. With Cache
+5. Main Settings Page
+6. Preload
+7. New Post
+8. Update Cache
+9. Delete Cache
+10. All cached files are deleted at the determinated time
+11. Block caching for post and pages (TinyMCE)
+12. Clean cached files via admin toolbar easily
+13. Exclude Page
+14. CDN
+15. Enter CDN Information
+16. File Types
+17. Specify Sources
 
 == Changelog ==
+
+= 0.8.6.1 =
+* <strong>[FEATURE]</strong>  exclude css sources
+* to fix Non-trailing Slash problem
+* to add specify source option for cdn integration
+* new interface of cdn tab
+* <strong>[FEATURE]</strong> to add Photon
+* <strong>[FEATURE]</strong> Multiple CDN
+* <strong>[FEATURE]</strong>  exclude js sources
+* to improve Combine JS feature
+* <strong>[FEATURE]</strong> Compatible with WpResidence theme
+* <strong>[FEATURE]</strong> to call preload manually
+
+= 0.8.6.0 =
+* to fix the problem about replacing url after minify css
+* to add "start with" option to the cache timeout
+* to add uninstall feature
+* to add "user-agent" option to the exclude page
+* to convert cache time to local time
+* to exclude WhatsApp user-agent
+
+= 0.8.5.9 =
+* to remove X-Wap-Profile from htaccess
+* to show warning lightbox if the cache cannot be deleted
+* <strong>[FEATURE]</strong> Set preload number
+* refactoring of is_wptouch_smartphone()
+* <strong>[FEATURE]</strong> to clear only the homepage cache
+* wp nonces added for security
 
 = 0.8.5.8 =
 * to remove hostname from exclude rule
@@ -612,6 +647,9 @@ Yes, it is compatible with WP-PostRatings.
 
 = Is this plugin compatible with AdRotate? =
 No, it is NOT compatible with AdRotate.
+
+= Is this plugin compatible with WP Hide & Security Enhancer? =
+No, it is NOT compatible with WP Hide & Security Enhancer.
 
 = Is this plugin compatible with WP-PostViews? =
 Yes, it is compatible with WP-PostViews. The current post views appear on the admin panel. The visitors cannot see the current post views. The developer of WP-PostViews needs to fix this issue.

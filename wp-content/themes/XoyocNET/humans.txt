@@ -5,14 +5,14 @@
 	Site: http://xoyoc.net
 
 	Location: Ciudad Lazaro Cardenas, Mexico.
-
-                                          
-						
+                  						
 /* THANKS */
 
 	Name: Jonathan MirCha http://bextlan.com
 
 	Name: Mejorandol@ http://mejorando.la
+
+	Name: Platzi http://platzi.com
 	
 	Name: Siempre agradezco a mis dos grandes inspiración L1 y L2
                         
